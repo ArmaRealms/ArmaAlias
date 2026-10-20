@@ -3,14 +3,14 @@ General_Settings:
   Executable_As_Console: true
   Console_Message: 'This alias cannot be executed as console!'
   # Enabled_Worlds: world
-  World_Message: '&cThis alias is not enabled in your world!'
+  World_Message: '<reset><red>This alias is not enabled in your world!'
   Execution_Order: Example, Example2
 
   Usage_Check:
     Enabled: false
     Min_Params: 0
     Max_Params: 0
-    Message: '&cInvalid usage!\n&6/example'
+    Message: '<reset><red>Invalid usage!\n<reset><gold>/example'
 
   Actions:
 
@@ -21,7 +21,6 @@ General_Settings:
       # Enabled_Permission_Groups: ExampleGroup
       # Enabled_Params: example@0
       Priority: 0
-      Translate_Color_Codes: false
       Message: '<gradient:#55ff55:#55ffff><bold>Hello, <sender_name>!</bold></gradient> <gray><hover:show_text:"Click to open help"><click:run_command:"/alias help">[Help]</click></hover></gray>'
       # PAPI: %player_name% for executor; %rel_example_relation% and
       # {viewer:player_name} per viewer when Broadcast is enabled.
@@ -34,7 +33,6 @@ General_Settings:
       # Enabled_Permission_Groups: ExampleGroup
       # Enabled_Params: example@0
       Priority: 0
-      Translate_Color_Codes: false
       # PAPI placeholders in commands use the player who invoked the alias.
       Command: 'msg <sender_name> Hi, this is an example!'
       Executor: CONSOLE
@@ -45,24 +43,24 @@ General_Settings:
     Enabled: true
     Node: SimpleAlias.use.example
     # Groups: ExampleGroup
-    Message: '&cYou do not have permission to use this alias!'
+    Message: '<reset><red>You do not have permission to use this alias!'
 
   Delay:
     Enabled: false
     Cancel_On_Move: false
     Duration: 10
-    Message: '&6The alias execution will commence in &e<remaining_time>&6.'
-    Cancel_Message: '&4The alias execution request was cancelled!'
+    Message: '<reset><gold>The alias execution will commence in <reset><yellow><remaining_time><reset><gold>.'
+    Cancel_Message: '<reset><dark_red>The alias execution request was cancelled!'
 
   Cooldown:
     Enabled: false
     Duration: 180
-    Message: '&cYou have to wait <remaining_time> until you can execute this alias again!'
+    Message: '<reset><red>You have to wait <remaining_time> until you can execute this alias again!'
 
   Cost:
     Enabled: false
     Amount: 40.0
-    Message: '&cYou do not have enough money to use this alias! &8(&6<cost_amount>&8)'
+    Message: '<reset><red>You do not have enough money to use this alias! <reset><dark_gray>(<reset><gold><cost_amount><reset><dark_gray>)'
 
   Logging:
     Enabled: false

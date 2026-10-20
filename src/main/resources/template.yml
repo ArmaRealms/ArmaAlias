@@ -18,7 +18,7 @@ General_Settings:
 
   # This is the message that will be displayed if the alias can't be executed in the world of the sender
   # Message variables: <world_name> (name of the world the sender is in)
-  World_Message: '&cThis alias is not enabled in your world!'
+  World_Message: '<reset><red>This alias is not enabled in your world!'
 
   # This is the execution order of the actions
   # Actions can be used more than one times
@@ -59,20 +59,17 @@ General_Settings:
       # If this action is triggered along with other actions and it has a higher priority only this and actions with the same priority will be executed
       Priority: 0
 
-      # Determines whether the color codes in the parameters will be translated for this action
-      # Color codes have to start with '&'
-      Translate_Color_Codes: false
 
-      # Messages use Adventure Components: <green>, <bold>, <#55ff99> and other MiniMessage tags.
-      # Existing &a, §a, &l, &r and RGB codes still work.
-      # PlaceholderAPI values with old &/§ colors are interpreted; returned MiniMessage
-      # is inserted as literal text (it cannot become a click/hover event).
+      # Messages use MiniMessage tags like <green>, <bold>, <#55ff99>.
+      # Legacy colors are not supported; &/§ codes in PAPI values are stripped.
+      # Dynamic values cannot introduce MiniMessage tags or click/hover events.
+      # Existing <reset><green>, §a, <bold>, <reset> and RGB codes still work.
       # This message can contain normal PlaceholderAPI placeholders for the executor:
       # %player_name% -> player who ran the alias (also when broadcasting).
       # %rel_<expansion>_<key>% -> relationship between executor and each viewer.
       # {viewer:player_name} -> normal PAPI placeholder resolved for each viewer.
       # Relational/viewer tokens are resolved per recipient only for MESSAGE actions.
-      # Example: '&a%player_name% &7-> &f{viewer:player_name} &7(%rel_example_relation%)'
+      # Example: '<green>%player_name%</green> <gray>-> {viewer:player_name} (%rel_example_relation%)</gray>'
       # This is an action specific setting called 'Message'
       # The example below uses MiniMessage tags:
       # <gradient:#55ff55:#55ffff> -> gradient with hex colors
@@ -119,9 +116,6 @@ General_Settings:
       # If this action is triggered along with other actions and it has a higher priority only this and actions with the same priority will be executed
       Priority: 0
 
-      # Determines whether the color codes in the parameters will be translated for this action
-      # Color codes have to start with '&'
-      Translate_Color_Codes: false
 
       # This is an action specific setting called 'Command'
       # Normal PlaceholderAPI values such as %player_name% and %vault_prefix%
@@ -157,7 +151,7 @@ General_Settings:
     # If you want a command with infinite parameters just fill in a high number like 100
     Max_Params: 0
 
-    Message: '&cInvalid usage!\n&6/example'
+    Message: '<reset><red>Invalid usage!\n<reset><gold>/example'
 
   # This section contains settings for the permission
   Permission:
@@ -175,7 +169,7 @@ General_Settings:
     # Groups: ExampleGroup
 
     # This is the message that will be displayed if the sender doesn't have permission
-    Message: '&cYou do not have permission to use this alias!'
+    Message: '<reset><red>You do not have permission to use this alias!'
 
   # This section contains settings for the execution delay of the actions
   Delay:
@@ -191,10 +185,10 @@ General_Settings:
     Duration: 10
 
     # This is the message that will be displayed if the delay is enabled
-    Message: '&6The alias execution will commence in &e<remaining_time>&6.'
+    Message: '<reset><gold>The alias execution will commence in <reset><yellow><remaining_time><reset><gold>.'
 
     # This is the message that will be displayed if the delay gets cancelled
-    Cancel_Message: '&4The alias execution request was cancelled!'
+    Cancel_Message: '<reset><dark_red>The alias execution request was cancelled!'
 
   # This section contains settings for the cooldown
   Cooldown:
@@ -207,7 +201,7 @@ General_Settings:
     Duration: 180
 
     # This is the message that will be displayed if someone tries to execute this alias while his cooldown is not over
-    Message: '&cYou have to wait <remaining_time> until you can execute this alias again!'
+    Message: '<reset><red>You have to wait <remaining_time> until you can execute this alias again!'
 
   # This section contains settings for the cost
   Cost:
@@ -221,7 +215,7 @@ General_Settings:
     Amount: 40.0
 
     # This is the message that will be displayed if the sender doesn't have enough money
-    Message: '&cYou do not have enough money to use this alias! &8(&6<cost_amount>&8)'
+    Message: '<reset><red>You do not have enough money to use this alias! <reset><dark_gray>(<reset><gold><cost_amount><reset><dark_gray>)'
 
   # This section contains settings for logging the execution of this alias
   # The execution will only be logged for players

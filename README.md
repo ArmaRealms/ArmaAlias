@@ -62,7 +62,7 @@ General_Settings:
   Actions:
     Announce:
       Type: MESSAGE
-      Message: '&a%player_name% &7-> &f{viewer:player_name} &8%rel_example_relation%'
+      Message: '<green>%player_name%</green> <gray>-> {viewer:player_name} (%rel_example_relation%)</gray>'
       Broadcast: true
 ```
 
@@ -76,16 +76,20 @@ multiple viewers, no-player console invocations, and reload of PAPI expansions.
 
 ## Adventure / MiniMessage formatting
 
-All player-facing messages now use Paper Adventure `Component` output.
-Configured alias messages, failure messages and language bundles accept
-`<green>`, `<#aabbcc>`, `<bold>` and other MiniMessage tags. Existing
-`&a`, `§a`, `&l`, `&r`, `&#aabbcc`, and RGB `§x§a§a§b§b§c§c`
-codes still render.
+All player-facing messages use **MiniMessage only**. Configure styling with tags
+such as `<red>`, `<bold>`, `<#aabbcc>`, `<gradient:green:aqua>`,
+`<hover:show_text:"...">` and `<click:run_command:"...">`.
 
-Dynamic values from PlaceholderAPI and alias parameters are inserted as
-component placeholders, not reparsed as MiniMessage: text such as
-`<click:run_command:/...>` returned by an expansion remains visible text
-instead of creating a click event. If PAPI returns `&a` or `§a` its
-color formatting is interpreted using the Adventure legacy serializer.
-Ordinary command actions remain **plain command strings**, preserving
-compatibility with Minecraft command syntax.
+Legacy codes (`&a`, `§a`, `&#aabbcc`, `§x§a§a...`) are **not supported**.
+Old formatting sequences are discarded from configured messages and
+PlaceholderAPI values, not converted to MiniMessage. Dynamic values are inserted
+as plain-text components; external MiniMessage tags cannot create click/hover
+events. Migrate existing alias configs and custom message bundles to MiniMessage.
+
+The removed `Translate_Color_Codes` option and `color` action-setting
+abbreviation are no longer accepted. Command actions remain plain strings,
+and PlaceholderAPI results are sanitized before command dispatch.
+
+```yaml
+Message: '<gradient:green:aqua><bold>Olá, <sender_name>!</bold></gradient> <gray>%player_name%</gray>'
+```
