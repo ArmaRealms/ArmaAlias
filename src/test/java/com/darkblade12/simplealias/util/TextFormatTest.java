@@ -50,11 +50,10 @@ public final class TextFormatTest {
     private static String readTemplateMessage(String path) {
         try {
             return Files.readAllLines(Path.of(path)).stream()
-                    .map(String::trim)
-                    .filter(line -> line.startsWith("Message: '") && line.endsWith("'"))
+                    .filter(line -> line.startsWith("      Message: '") && line.endsWith("'"))
                     .findFirst()
-                    .orElseThrow(() -> new AssertionError("missing active Message example: " + path))
-                    .replaceFirst("^Message: '", "").replaceFirst("'$", "");
+                    .orElseThrow(() -> new AssertionError("missing action Message example: " + path))
+                    .substring("      Message: '".length()).replaceFirst("'$", "");
         } catch (IOException e) {
             throw new AssertionError("unable to read template: " + path, e);
         }
