@@ -24,7 +24,7 @@ public final class ReloadCommand extends CommandBase<SimpleAlias> {
                 plugin.onReload();
                 long duration = System.currentTimeMillis() - start;
 
-                plugin.sendMessage(sender, "command.alias.reload.succeeded", plugin.getDescription().getVersion(), duration);
+                plugin.sendMessage(sender, "command.alias.reload.succeeded", plugin.getPluginMeta().getVersion(), duration);
             } catch (Exception e) {
                 plugin.sendMessage(sender, "command.alias.reload.failed");
                 e.printStackTrace();

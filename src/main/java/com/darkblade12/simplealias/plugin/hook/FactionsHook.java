@@ -15,7 +15,8 @@ public class FactionsHook extends Hook {
     @Override
     protected boolean initialize() {
         Plugin massiveCore = Bukkit.getServer().getPluginManager().getPlugin("MassiveCore");
-        return massiveCore != null && massiveCore.isEnabled();
+        Plugin factions = Bukkit.getServer().getPluginManager().getPlugin("Factions");
+        return massiveCore != null && massiveCore.isEnabled() && factions != null && factions.isEnabled();
     }
 
     public String getFaction(Player player) {

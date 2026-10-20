@@ -13,9 +13,9 @@ General_Settings:
   # Determines whether the converter for old alias configs is enabled
   Converter_Enabled: false
 
-  # Determines whether all commands are synchronized after an alias has been added or removed
-  # Enabling this setting leads to aliases being immediately added to or removed from tab completion suggestions
-  # If this is disabled, commands will be updated naturally after a reload or server restart
+  # Rebuilds Brigadier commands after creating, deleting, or renaming aliases.
+  # This invokes Minecraft's data reload on the following server tick (expensive).
+  # Set false to apply new command labels only after /minecraft:reload or restart.
   Command_Sync: true
 
   # The section below contains commands which will be disabled by SimpleAlias

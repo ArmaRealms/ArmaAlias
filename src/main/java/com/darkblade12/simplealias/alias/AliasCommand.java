@@ -1,114 +1,68 @@
 package com.darkblade12.simplealias.alias;
 
+import com.darkblade12.simplealias.SimpleAlias;
+import io.papermc.paper.command.brigadier.BasicCommand;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
-import org.bukkit.command.SimpleCommandMap;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
+import java.util.Locale;
 
-public final class AliasCommand extends Command {
-    private static final String FALLBACK_PREFIX = "alias";
-    private static Field commandMapField;
-    private static Field knownCommandsField;
-    private static Method syncCommandsMethod;
-    private final Alias alias;
+/**
+ * Bridges a configured alias to Paper's Brigadier command system.
+ * The alias is resolved by name on every invocation so that removed aliases do not execute.
+ */
+public final class AliasCommand implements BasicCommand {
+    private final SimpleAlias plugin;
+    private final String name;
 
-    static {
-        try {
-            commandMapField = Bukkit.getServer().getClass().getDeclaredField("commandMap");
-            commandMapField.setAccessible(true);
-            knownCommandsField = SimpleCommandMap.class.getDeclaredField("knownCommands");
-            knownCommandsField.setAccessible(true);
-            syncCommandsMethod = Bukkit.getServer().getClass().getMethod("syncCommands");
-            syncCommandsMethod.setAccessible(true);
-        } catch (Exception e) {
-            e.printStackTrace();
+    public AliasCommand(SimpleAlias plugin, String name) {
+        this.plugin = plugin;
+        this.name = name;
+    }
+
+    @Override
+    public void execute(CommandSourceStack source, String[] args) {
+        Alias alias = plugin.getAliasManager().getAlias(name);
+        if (alias != null) {
+            alias.execute(source.getSender(), args);
         }
     }
 
-    public AliasCommand(Alias alias) {
-        super(alias.getName(), alias.getDescription(), alias.getUsageCheckMessage(), Collections.emptyList());
-        this.alias = alias;
+    @Override
+    public boolean canUse(CommandSender sender) {
+        Alias alias = plugin.getAliasManager().getAlias(name);
+        return alias != null && alias.testPermission(sender);
     }
 
-    public static void syncCommands() {
-        try {
-            syncCommandsMethod.invoke(Bukkit.getServer());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    @Override
+    public Collection<String> suggest(CommandSourceStack source, String[] args) {
+        return Collections.emptyList();
     }
 
+    /**
+     * The console executor must handle vanilla commands with a console source,
+     * because command dispatching with a player proxy does not support every vanilla command.
+     */
     public static boolean isVanillaCommand(String commandLine) {
-        String commandName = commandLine.split(" ")[0].toLowerCase();
-
-        try {
-            SimpleCommandMap commandMap = (SimpleCommandMap) commandMapField.get(Bukkit.getServer());
-            Command command = commandMap.getCommand(commandName);
-            if (command == null || command instanceof PluginCommand) {
-                return false;
-            } else if (commandName.startsWith("minecraft:")) {
-                return true;
-            }
-
-            Command fallbackCommand = commandMap.getCommand("minecraft:" + commandName);
-            return fallbackCommand != null && command == fallbackCommand;
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (commandLine.isBlank()) {
             return false;
         }
-    }
 
-    @Override
-    public boolean execute(CommandSender sender, String label, String[] args) {
-        alias.execute(sender, args);
-        return true;
-    }
-
-    @Override
-    public boolean testPermissionSilent(CommandSender target) {
-        return alias.testPermission(target);
-    }
-
-    public boolean register() throws IllegalStateException {
-        if (isRegistered()) {
-            throw new IllegalStateException("Command is already registered.");
-        }
-
-        try {
-            SimpleCommandMap commandMap = (SimpleCommandMap) commandMapField.get(Bukkit.getServer());
-            return commandMap.register(getName(), FALLBACK_PREFIX, this);
-        } catch (Exception e) {
-            e.printStackTrace();
+        String commandName = commandLine.split(" ", 2)[0].toLowerCase(Locale.ROOT);
+        Command command = Bukkit.getCommandMap().getCommand(commandName);
+        if (command == null || command instanceof PluginCommand) {
             return false;
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    public boolean unregister() throws IllegalStateException {
-        if (!isRegistered()) {
-            throw new IllegalStateException("Command is not registered.");
+        if (commandName.startsWith("minecraft:")) {
+            return true;
         }
 
-        try {
-            SimpleCommandMap commandMap = (SimpleCommandMap) commandMapField.get(Bukkit.getServer());
-            Map<String, Command> commands = (Map<String, Command>) knownCommandsField.get(commandMap);
-
-            String name = getName();
-            String[] labels = { name, FALLBACK_PREFIX + ":" + name };
-            for (String label : labels) {
-                commands.remove(label);
-            }
-
-            return unregister(commandMap);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
+        Command vanillaCommand = Bukkit.getCommandMap().getCommand("minecraft:" + commandName);
+        return vanillaCommand != null && vanillaCommand == command;
     }
 }

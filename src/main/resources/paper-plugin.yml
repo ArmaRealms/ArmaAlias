@@ -1,0 +1,33 @@
+name: SimpleAlias
+version: '${project.version}'
+main: com.darkblade12.simplealias.SimpleAlias
+description: Configurable aliases with Paper Brigadier commands
+website: https://github.com/ArmaRealms/ArmaAlias
+authors: [DarkBlade12, ArmaRealms]
+api-version: '1.21.11'
+dependencies:
+  server:
+    Vault:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    Factions:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    MassiveCore:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    Multiverse-Core:
+      load: BEFORE
+      required: false
+    Multiworld:
+      load: BEFORE
+      required: false
+    PlotMe:
+      load: BEFORE
+      required: false
+    MyWorlds:
+      load: BEFORE
+      required: false

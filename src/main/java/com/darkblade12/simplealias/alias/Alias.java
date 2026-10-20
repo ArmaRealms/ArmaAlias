@@ -49,7 +49,6 @@ public final class Alias implements Nameable {
     public static final String DEFAULT_DESCRIPTION = "No description set";
     private final SimpleAlias plugin;
     private final ConfigurationReader<SimpleAlias> reader;
-    private AliasCommand command;
     private String name;
     private String description;
     private boolean executableAsConsole;
@@ -96,10 +95,6 @@ public final class Alias implements Nameable {
         }
         loadSettings();
 
-        command = new AliasCommand(this);
-        command.setPermissionMessage(permissionMessage);
-
-        registerCommand();
     }
 
     private Alias(SimpleAlias plugin, ConfigurationReader<SimpleAlias> reader) throws AliasException, InvalidValueException {
@@ -356,17 +351,8 @@ public final class Alias implements Nameable {
     }
 
     public void reloadSettings() throws AliasException, InvalidValueException {
-        if (command.isRegistered()) {
-            unregisterCommand();
-        }
-
         loadSettings();
-
-        command.setDescription(description);
-        command.setUsage(usageCheckMessage);
-        command.setPermissionMessage(permissionMessage);
-
-        registerCommand();
+        plugin.refreshCommands();
     }
 
     public void saveSettings() throws AliasException {
@@ -459,26 +445,6 @@ public final class Alias implements Nameable {
         }
     }
 
-    public void registerCommand() throws AliasException {
-        try {
-            if (!command.register()) {
-                throw new AliasException(String.format("Failed to register alias '%s' as a command.", name));
-            }
-        } catch (IllegalStateException e) {
-            throw new AliasException(String.format("Alias '%s' is already registered as a command.", name));
-        }
-    }
-
-    public void unregisterCommand() throws AliasException {
-        try {
-            if (!command.unregister()) {
-                throw new AliasException(String.format("Failed to unregister alias '%s' from commands.", name));
-            }
-        } catch (IllegalStateException e) {
-            throw new AliasException(String.format("Alias '%s' is not registered as a command.", name));
-        }
-    }
-
     public boolean testPermission(CommandSender sender) {
         if (!permissionEnabled || sender instanceof ConsoleCommandSender) {
             return true;
@@ -505,7 +471,7 @@ public final class Alias implements Nameable {
                                         .with(DynamicVariable.PARAMS, StringUtils.join(params, " "))
                                         .with(DynamicVariable.SENDER_NAME, sender.getName())
                                         .build();
-            Bukkit.getLogger().info(replacer.replaceAll(loggingMessage));
+            plugin.getLogger().info(replacer.replaceAll(loggingMessage));
         }
 
         if (!testPermission(sender)) {
@@ -646,21 +612,8 @@ public final class Alias implements Nameable {
             throw new AliasException(String.format("Failed to rename alias configuration to '%s'.", fileName));
         }
 
-        unregisterCommand();
-        command.setName(name);
-        try {
-            registerCommand();
-        } catch (AliasException e) {
-            command.setName(this.name);
-            registerCommand();
-            throw e;
-        }
-
         this.name = name;
-
-        if (plugin.getSettings().hasCommandSync()) {
-            AliasCommand.syncCommands();
-        }
+        plugin.refreshCommands();
     }
 
     public void renameAction(Action action, String newName) {
@@ -678,7 +631,6 @@ public final class Alias implements Nameable {
 
     public void setDescription(String description) {
         this.description = description;
-        command.setDescription(description);
     }
 
     public void setExecutableAsConsole(boolean executableAsConsole) {
@@ -759,7 +711,6 @@ public final class Alias implements Nameable {
 
     public void setUsageCheckMessage(String usageCheckMessage) {
         this.usageCheckMessage = usageCheckMessage;
-        command.setUsage(usageCheckMessage);
     }
 
     public void setPermissionEnabled(boolean permissionEnabled) {
@@ -776,7 +727,6 @@ public final class Alias implements Nameable {
 
     public void setPermissionMessage(String permissionMessage) {
         this.permissionMessage = permissionMessage;
-        command.setPermissionMessage(permissionMessage);
     }
 
     public void setDelayEnabled(boolean delayEnabled) {
@@ -964,7 +914,4 @@ public final class Alias implements Nameable {
         return loggingMessage;
     }
 
-    public AliasCommand getCommand() {
-        return command;
-    }
 }

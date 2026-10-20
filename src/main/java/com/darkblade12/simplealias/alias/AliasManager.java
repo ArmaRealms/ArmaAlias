@@ -26,7 +26,7 @@ public final class AliasManager extends Manager<SimpleAlias> {
     private final Set<UUID> uncheckedPlayers;
 
     public AliasManager(SimpleAlias plugin) {
-        super(plugin, new File("plugins/SimpleAlias/aliases/"));
+        super(plugin, new File(plugin.getDataFolder(), "aliases"));
         aliases = new NameableList<>();
         uncheckedPlayers = new HashSet<>();
     }
@@ -41,7 +41,6 @@ public final class AliasManager extends Manager<SimpleAlias> {
 
     @Override
     protected void onDisable() {
-        unloadAliases();
         aliases.clear();
         uncheckedPlayers.clear();
     }
@@ -67,15 +66,10 @@ public final class AliasManager extends Manager<SimpleAlias> {
         }
     }
 
-    private void unloadAliases() {
-        for (int i = 0; i < aliases.size(); i++) {
-            Alias alias = aliases.get(i);
-            try {
-                alias.unregisterCommand();
-            } catch (AliasException e) {
-                plugin.logException("{0}", e);
-            }
-        }
+    @Override
+    protected void onReload() {
+        super.onReload();
+        plugin.refreshCommands();
     }
 
     public Alias createAlias(String name) throws AliasException, InvalidValueException {
@@ -84,22 +78,15 @@ public final class AliasManager extends Manager<SimpleAlias> {
         }
 
         Alias alias = new Alias(plugin, name, true);
-        if (plugin.getSettings().hasCommandSync()) {
-            AliasCommand.syncCommands();
-        }
-
         aliases.add(alias);
+        plugin.refreshCommands();
         return alias;
     }
 
     public void removeAlias(Alias alias) throws AliasException {
-        alias.unregisterCommand();
         alias.deleteSettings();
-
-        if (plugin.getSettings().hasCommandSync()) {
-            AliasCommand.syncCommands();
-        }
         aliases.remove(alias.getName());
+        plugin.refreshCommands();
     }
 
     public void addUncheckedPlayer(Player player) {

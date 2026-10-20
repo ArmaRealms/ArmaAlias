@@ -74,16 +74,15 @@ public abstract class PluginBase extends JavaPlugin {
 
         enableMetrics();
         long duration = System.currentTimeMillis() - startTime;
-        logInfo("Plugin version {0} enabled! ({1} ms)", getDescription().getVersion(), duration);
+        logInfo("Plugin version {0} enabled! ({1} ms)", getPluginMeta().getVersion(), duration);
 
-        checkForUpdates();
     }
 
     @Override
     public void onDisable() {
         disable();
         messageManager.disable();
-        logInfo("Plugin version {0} disabled.", getDescription().getVersion());
+        logInfo("Plugin version {0} disabled.", getPluginMeta().getVersion());
     }
 
     public void onReload() {
@@ -100,7 +99,7 @@ public abstract class PluginBase extends JavaPlugin {
             return;
         }
 
-        logInfo("Plugin version {0} reloaded!", getDescription().getVersion());
+        logInfo("Plugin version {0} reloaded!", getPluginMeta().getVersion());
     }
 
     public abstract boolean enable();
@@ -220,7 +219,7 @@ public abstract class PluginBase extends JavaPlugin {
         }
 
         String latestVersion = matcher.group();
-        int[] currentNumbers = splitVersion(getDescription().getVersion());
+        int[] currentNumbers = splitVersion(getPluginMeta().getVersion());
         int[] latestNumbers = splitVersion(latestVersion);
         if (currentNumbers == null || latestNumbers == null || currentNumbers.length != latestNumbers.length) {
             logInfo("Failed to compare versions!");
