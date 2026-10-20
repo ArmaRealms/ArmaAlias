@@ -294,7 +294,6 @@ public final class Alias implements Nameable {
             }
 
             int priority = section.getInt(ActionSetting.PRIORITY.getPath());
-            boolean translateColorCodes = section.getBoolean(ActionSetting.TRANSLATE_COLOR_CODES.getPath());
 
             switch (type) {
                 case COMMAND:
@@ -324,13 +323,13 @@ public final class Alias implements Nameable {
                     boolean silent = section.getBoolean(ActionSetting.SILENT.getPath());
 
                     actions.add(new CommandAction(actionName, enabledWorlds, enabledPermissionNodes, enabledPermissionGroups, enabledParams,
-                                                  priority, translateColorCodes, command, executor, grantPermission, silent));
+                                                  priority, command, executor, grantPermission, silent));
                     break;
                 case MESSAGE:
                     List<String> lines = section.getStringList(ActionSetting.MESSAGE.getPath());
                     String message;
                     if (!lines.isEmpty()) {
-                        message = ConvertUtils.join(lines, "\n§r");
+                        message = ConvertUtils.join(lines, "\n");
                     } else {
                         message = section.getString(ActionSetting.MESSAGE.getPath());
                         if (MessageUtils.isBlank(message)) {
@@ -342,7 +341,7 @@ public final class Alias implements Nameable {
                     boolean broadcast = section.getBoolean(ActionSetting.BROADCAST.getPath());
 
                     actions.add(new MessageAction(actionName, enabledWorlds, enabledPermissionNodes, enabledPermissionGroups, enabledParams,
-                                                  priority, translateColorCodes, message, broadcast));
+                                                  priority, message, broadcast));
                     break;
             }
         }
@@ -394,7 +393,6 @@ public final class Alias implements Nameable {
                                                .collect(Collectors.toList());
             section.set(ActionSetting.ENABLED_PARAMS.getPath(), enabledParams);
             section.set(ActionSetting.PRIORITY.getPath(), action.getPriority());
-            section.set(ActionSetting.TRANSLATE_COLOR_CODES.getPath(), action.hasTranslateColorCodes());
 
             if (action instanceof CommandAction) {
                 CommandAction commandAction = (CommandAction) action;
