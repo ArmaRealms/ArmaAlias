@@ -22,7 +22,7 @@ General_Settings:
   # This is useful if you want that a certain alias is used instead of the original command
   # You can add them by making a section like this: '<command>: <message>'
   # The examples below are disabled, in order to enable them simply remove the '#'
-  # Color codes starting with '&' and unicode symbols will be translated
+  # Messages use MiniMessage tags such as <red>Unknown command</red>.
   Disabled_Commands:
 
   # plugins: 'Unknown Command. Type "/help" for help.'
@@ -67,7 +67,6 @@ General_Settings:
     engrps: 'Enabled_Permission_Groups'
     enpar: 'Enabled_Params'
     prio: 'Priority'
-    color: 'Translate_Color_Codes'
     cmd: 'Command'
     exec: 'Executor'
     gperm: 'Grant_Permission'

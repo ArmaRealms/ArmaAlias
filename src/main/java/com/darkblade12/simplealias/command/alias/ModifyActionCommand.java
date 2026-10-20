@@ -212,18 +212,6 @@ public final class ModifyActionCommand extends CommandBase<SimpleAlias> {
 
                 action.setPriority(priority);
                 break;
-            case TRANSLATE_COLOR_CODES:
-                boolean translateColorCodes;
-                try {
-                    translateColorCodes = ConvertUtils.convertToBoolean(value);
-                } catch (Exception e) {
-                    plugin.sendMessage(sender, "value.noBoolean", value);
-                    return;
-                }
-
-                value = String.valueOf(translateColorCodes);
-                action.setTranslateColorCodes(translateColorCodes);
-                break;
             case COMMAND:
                 if (action.getType() != ActionType.COMMAND) {
                     plugin.sendMessage(sender, "command.alias.modifyaction.onlyCommand", settingName);
@@ -369,7 +357,6 @@ public final class ModifyActionCommand extends CommandBase<SimpleAlias> {
                             return Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList());
                         case ENABLED_PERMISSION_GROUPS:
                             return Arrays.asList(plugin.getVaultHook().getGroups());
-                        case TRANSLATE_COLOR_CODES:
                         case GRANT_PERMISSION:
                         case BROADCAST:
                             return args.length > 5 ? null : Arrays.asList("true", "false");

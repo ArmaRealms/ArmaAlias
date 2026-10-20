@@ -61,7 +61,6 @@ public final class DetailsCommand extends CommandBase<SimpleAlias> {
             builder.append(getLine(plugin, 3, ActionSetting.ENABLED_PERMISSION_GROUPS, action.getEnabledPermissionGroups()));
             builder.append(getLine(plugin, 3, ActionSetting.ENABLED_PARAMS, action.getEnabledParams()));
             builder.append(getLine(plugin, 3, ActionSetting.PRIORITY, action.getPriority()));
-            builder.append(getLine(plugin, 3, ActionSetting.TRANSLATE_COLOR_CODES, action.hasTranslateColorCodes()));
 
             if (action instanceof CommandAction) {
                 CommandAction commandAction = (CommandAction) action;
@@ -114,7 +113,7 @@ public final class DetailsCommand extends CommandBase<SimpleAlias> {
 
     private String getLine(SimpleAlias plugin, int indentationLevel, String key, Object value) {
         String spacer = IntStream.range(0, indentationLevel).mapToObj(i -> " ").collect(Collectors.joining());
-        return "\n§r" + spacer + plugin.formatMessage("command.alias.details.line", key, String.valueOf(value));
+        return "\n<reset>" + spacer + plugin.formatMessage("command.alias.details.line", key, String.valueOf(value));
     }
 
     private String getLine(SimpleAlias plugin, int indentationLevel, Enum<?> key, Object value) {

@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class SimpleAlias extends PluginBase {
-    public static final String PREFIX = "§8§l[§a§oSimple§7§oAlias§8§l]§r";
+    public static final String PREFIX = "<dark_gray><bold>[<green><italic>Simple<gray><italic>Alias<dark_gray><bold>]<reset>";
     private final Settings settings;
     private final VaultHook vaultHook;
     private final PlaceholderHook placeholderHook;

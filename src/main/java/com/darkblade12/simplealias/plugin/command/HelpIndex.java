@@ -28,12 +28,12 @@ final class HelpIndex<T extends PluginBase> {
             if (index > visible.size() - 1) {
                 break;
             }
-            message.append("\n\u00A7r").append(getInfo(visible.get(index), label));
+            message.append("\n<reset>").append(getInfo(visible.get(index), label));
         }
 
         int pages = getPages(sender);
-        String currentPage = (page == pages ? "\u00A76\u00A7l" : "\u00A7a\u00A7l") + page;
-        message.append("\n\u00A7r").append(plugin.formatMessage("command.help.footer", currentPage, pages));
+        String currentPage = (page == pages ? "<gold><bold>" : "<green><bold>") + page;
+        message.append("\n<reset>").append(plugin.formatMessage("command.help.footer", currentPage, pages));
         sender.sendMessage(TextFormat.render(message.toString()));
     }
 

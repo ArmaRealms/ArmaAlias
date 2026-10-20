@@ -11,7 +11,7 @@ import java.util.ResourceBundle;
 
 public class MessageManager extends Manager<PluginBase> {
     private static final String BUNDLE_NAME = "messages";
-    private static final MessageFormat MISSING_FORMAT = new MessageFormat("§cThe message §6{0} §cis not available!");
+    private static final MessageFormat MISSING_FORMAT = new MessageFormat("<red>The message <gold>{0} <red>is not available!");
     private final Map<String, MessageFormat> messageCache;
     private ResourceBundle bundle;
 
