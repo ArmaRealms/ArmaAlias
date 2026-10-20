@@ -177,12 +177,7 @@ public abstract class PluginBase extends JavaPlugin {
 
     private void enableMetrics() {
         try {
-            Metrics metrics = new Metrics(this, pluginId);
-            if (!metrics.isEnabled()) {
-                logWarning("Metrics is disabled!");
-            } else {
-                logInfo("This plugin is using Metrics by BtoBastian.");
-            }
+            new Metrics(this, pluginId);
         } catch (Exception e) {
             logException("Failed to enable Metrics: {0}", e);
         }
