@@ -11,17 +11,23 @@ import java.util.regex.Pattern;
 /** MiniMessage is the only supported formatting syntax; dynamic values remain literal. */
 public final class TextFormat {
     private static final MiniMessage MINI = MiniMessage.miniMessage();
-    private static final Pattern LEGACY_CODES = Pattern.compile(
-            "(?i)(?:§x(?:[&§][0-9a-f]){6}|&x(?:[&§][0-9a-f]){6}"
-            + "|§#[0-9a-f]{6}|&#[0-9a-f]{6}"
-            + "|§[0-9a-fk-orx]|(?<![\\p{L}\\p{N}])&[0-9a-fk-orx])");
+    private static final Pattern SECTION_CODES = Pattern.compile(
+            "(?i)(?:§x(?:[&§][0-9a-f]){6}|§#[0-9a-f]{6}|§[0-9a-fk-orx])");
+    private static final Pattern AMPERSAND_CODES = Pattern.compile(
+            "(?i)(?:&x(?:[&§][0-9a-f]){6}|&#[0-9a-f]{6}"
+            + "|(?<![\\p{L}\\p{N}])(?:&[0-9a-fk-or])+)");
+
 
     private TextFormat() {
     }
 
     /** Discard recognized legacy formatting from external values while preserving ordinary text. */
     public static String stripLegacyCodes(String input) {
-        return input == null ? "" : LEGACY_CODES.matcher(input).replaceAll("").replace("§", "");
+        if (input == null) {
+            return "";
+        }
+        String withoutSection = SECTION_CODES.matcher(input).replaceAll("").replace("§", "");
+        return AMPERSAND_CODES.matcher(withoutSection).replaceAll("");
     }
 
     public static Component render(String template) {

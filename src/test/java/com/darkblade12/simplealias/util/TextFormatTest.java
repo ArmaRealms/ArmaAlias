@@ -18,6 +18,10 @@ public final class TextFormatTest {
         check("Hello", TextFormat.stripLegacyCodes("&x&a&a&b&b&c&cHello"), "RGB ampersand stripped");
         check("A plain & separator", TextFormat.stripLegacyCodes("A plain & separator"), "ordinary ampersand");
         check("R&D", TextFormat.stripLegacyCodes("R&D"), "literal ampersand inside words");
+        check("Alice", TextFormat.stripLegacyCodes("§a&lAlice"), "mixed section and ampersand codes");
+        check("Alice", TextFormat.stripLegacyCodes("&a&lAlice"), "consecutive ampersand codes");
+        check("Alice", TextFormat.stripLegacyCodes("&a§l&nAlice"), "mixed consecutive code chain");
+        check("Alice", TextFormat.stripLegacyCodes("&#aabbcc&aAlice"), "hex and ampersand chain");
         check("R&D", PlainTextComponentSerializer.plainText().serialize(
                 TextFormat.render("R&D")), "MiniMessage template leaves literal ampersand alone");
         check("R&D", PlainTextComponentSerializer.plainText().serialize(
