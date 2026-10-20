@@ -60,7 +60,7 @@ public final class AliasConverter {
         }
 
         if (config.getString(AliasSetting.WORLD_MESSAGE.getPath()) == null) {
-            config.set(AliasSetting.WORLD_MESSAGE.getPath(), "&cThis alias is not enabled in your world!");
+            config.set(AliasSetting.WORLD_MESSAGE.getPath(), "<red>This alias is not enabled in your world!");
             converted = true;
         }
 

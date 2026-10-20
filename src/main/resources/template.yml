@@ -63,7 +63,6 @@ General_Settings:
       # Messages use MiniMessage tags like <green>, <bold>, <#55ff99>.
       # Legacy colors are not supported; &/§ codes in PAPI values are stripped.
       # Dynamic values cannot introduce MiniMessage tags or click/hover events.
-      # Existing <reset><green>, §a, <bold>, <reset> and RGB codes still work.
       # This message can contain normal PlaceholderAPI placeholders for the executor:
       # %player_name% -> player who ran the alias (also when broadcasting).
       # %rel_<expansion>_<key>% -> relationship between executor and each viewer.
