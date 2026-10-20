@@ -15,9 +15,9 @@ public final class CommandAction extends Action {
     private boolean silent;
 
     public CommandAction(String name, Set<String> enabledWorlds, Set<String> enabledPermissionNodes, Set<String> enabledPermissionGroups,
-                         Map<Integer, String> enabledParams, int priority, boolean translateColorCodes, String command, Executor executor,
+                         Map<Integer, String> enabledParams, int priority, String command, Executor executor,
                          boolean grantPermission, boolean silent) {
-        super(name, enabledWorlds, enabledPermissionNodes, enabledPermissionGroups, enabledParams, priority, translateColorCodes);
+        super(name, enabledWorlds, enabledPermissionNodes, enabledPermissionGroups, enabledParams, priority);
         this.command = command;
         this.executor = executor;
         this.grantPermission = grantPermission;
@@ -25,7 +25,7 @@ public final class CommandAction extends Action {
     }
 
     public CommandAction(String name, String command) {
-        this(name, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashMap<>(), 0, false, command, Executor.SENDER, false, false);
+        this(name, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashMap<>(), 0, command, Executor.SENDER, false, false);
     }
 
     @Override

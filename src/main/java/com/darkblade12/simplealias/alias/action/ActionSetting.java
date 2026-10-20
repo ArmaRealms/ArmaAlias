@@ -19,7 +19,6 @@ public enum ActionSetting implements SettingInfo {
     ENABLED_PERMISSION_GROUPS("Enabled_Permission_Groups", ModifyOperation.ADD),
     ENABLED_PARAMS("Enabled_Params", ModifyOperation.ADD),
     PRIORITY("Priority"),
-    TRANSLATE_COLOR_CODES("Translate_Color_Codes"),
     COMMAND("Command"),
     EXECUTOR("Executor"),
     GRANT_PERMISSION("Grant_Permission"),

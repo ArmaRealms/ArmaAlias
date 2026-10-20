@@ -5,7 +5,6 @@ import com.darkblade12.simplealias.alias.DynamicVariable;
 import com.darkblade12.simplealias.nameable.Nameable;
 import com.darkblade12.simplealias.plugin.hook.VaultHook;
 import com.darkblade12.simplealias.replacer.Replacer;
-import com.darkblade12.simplealias.util.MessageUtils;
 import com.darkblade12.simplealias.util.ConvertUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -23,26 +22,20 @@ public abstract class Action implements Nameable, Comparable<Action> {
     protected Set<String> enabledPermissionGroups;
     protected Map<Integer, String> enabledParams;
     protected int priority;
-    protected boolean translateColorCodes;
 
     protected Action(String name, Set<String> enabledWorlds, Set<String> enabledPermissionNodes, Set<String> enabledPermissionGroups,
-                     Map<Integer, String> enabledParams, int priority, boolean translateColorCodes) {
+                     Map<Integer, String> enabledParams, int priority) {
         this.name = name;
         this.enabledWorlds = enabledWorlds;
         this.enabledPermissionNodes = enabledPermissionNodes;
         this.enabledPermissionGroups = enabledPermissionGroups;
         this.enabledParams = enabledParams;
         this.priority = priority;
-        this.translateColorCodes = translateColorCodes;
     }
 
     public abstract void execute(SimpleAlias plugin, CommandSender sender, String[] params);
 
     protected String replaceVariables(String target, SimpleAlias plugin, CommandSender sender, String[] params) {
-        if (translateColorCodes) {
-            params = MessageUtils.translateArguments(params);
-        }
-
         Replacer.ReplacerBuilder builder = Replacer.builder().with(DynamicVariable.SENDER_NAME, sender.getName());
 
         if (sender instanceof Player) {
@@ -128,10 +121,6 @@ public abstract class Action implements Nameable, Comparable<Action> {
         this.priority = priority;
     }
 
-    public void setTranslateColorCodes(boolean translateColorCodes) {
-        this.translateColorCodes = translateColorCodes;
-    }
-
     @Override
     public String getName() {
         return this.name;
@@ -184,10 +173,6 @@ public abstract class Action implements Nameable, Comparable<Action> {
 
     public int getPriority() {
         return priority;
-    }
-
-    public boolean hasTranslateColorCodes() {
-        return translateColorCodes;
     }
 
     public abstract ActionType getType();
