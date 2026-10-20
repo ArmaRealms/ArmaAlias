@@ -4,6 +4,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import java.util.Map;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.io.IOException;
 
 /** Regression tests: trusted MiniMessage, both legacy color formats and untrusted PAPI values. */
 public final class TextFormatTest {
@@ -30,6 +33,36 @@ public final class TextFormatTest {
         if (!MiniMessage.miniMessage().serialize(legacy).contains("red")) {
             throw new AssertionError("legacy red color was not preserved");
         }
+
+        String commented = readTemplateMessage("src/main/resources/template.yml");
+        String uncommented = readTemplateMessage("src/main/resources/template_uncommented.yml");
+        check(commented, uncommented, "templates use the same MiniMessage example");
+
+        Component template = TextFormat.render(commented.replace("<sender_name>", "<armavalue0>"),
+                Map.of("armavalue0", Component.text("Alex")));
+        check("Hello, Alex! [Help]",
+                PlainTextComponentSerializer.plainText().serialize(template), "template example rendering");
+        if (!hasClickEvent(template) || !hasHoverEvent(template)) {
+            throw new AssertionError("template MiniMessage example must expose click and hover events");
+        }
+    }
+
+    private static String readTemplateMessage(String path) {
+        try {
+            return Files.readAllLines(Path.of(path)).stream()
+                    .map(String::trim)
+                    .filter(line -> line.startsWith("Message: '") && line.endsWith("'"))
+                    .findFirst()
+                    .orElseThrow(() -> new AssertionError("missing active Message example: " + path))
+                    .replaceFirst("^Message: '", "").replaceFirst("'$", "");
+        } catch (IOException e) {
+            throw new AssertionError("unable to read template: " + path, e);
+        }
+    }
+
+    private static boolean hasHoverEvent(Component component) {
+        return component.hoverEvent() != null
+                || component.children().stream().anyMatch(TextFormatTest::hasHoverEvent);
     }
 
     private static boolean hasClickEvent(Component component) {
