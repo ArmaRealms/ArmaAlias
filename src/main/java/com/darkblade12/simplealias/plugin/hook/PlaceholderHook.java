@@ -1,6 +1,7 @@
 package com.darkblade12.simplealias.plugin.hook;
 
 import com.darkblade12.simplealias.util.ViewerPlaceholders;
+import com.darkblade12.simplealias.util.TextFormat;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -31,7 +32,7 @@ public final class PlaceholderHook extends Hook {
         if (!isAvailable() || !(sender instanceof Player actor) || text.indexOf('%') < 0) {
             return text;
         }
-        return PlaceholderAPI.setPlaceholders(actor, text);
+        return TextFormat.stripLegacyCodes(PlaceholderAPI.setPlaceholders(actor, text));
     }
 
     /** Relational placeholders compare the actor with each viewer. */
@@ -49,7 +50,7 @@ public final class PlaceholderHook extends Hook {
             result = ViewerPlaceholders.replace(result,
                     identifier -> PlaceholderAPI.setPlaceholders(viewer, "%" + identifier + "%"));
         }
-        return result;
+        return TextFormat.stripLegacyCodes(result);
     }
 
     public boolean needsViewerContext(String text) {

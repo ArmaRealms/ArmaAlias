@@ -1,20 +1,14 @@
 package com.darkblade12.simplealias.util;
 
-import com.darkblade12.simplealias.util.JavaEscapes;
-import com.darkblade12.simplealias.util.ConvertUtils;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import net.kyori.adventure.text.format.NamedTextColor;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public final class MessageUtils {
-    private static final Pattern COLOR_CODE_PATTERN = Pattern.compile("§([0-9a-fk-orx])", Pattern.CASE_INSENSITIVE);
-    private static final Pattern ARGUMENT_COLOR_PATTERN = Pattern.compile("(?i)&([0-9a-fk-or])");
-
     private static final NamedTextColor[] RANDOM_COLORS = {
             NamedTextColor.DARK_BLUE, NamedTextColor.DARK_GREEN, NamedTextColor.DARK_AQUA,
             NamedTextColor.DARK_RED, NamedTextColor.DARK_PURPLE, NamedTextColor.GOLD,
@@ -67,33 +61,12 @@ public final class MessageUtils {
         return message == null || message.isEmpty() || message.matches("\\s+");
     }
 
-    public static String translateMessage(String message, char colorChar) {
+    public static String translateMessage(String message) {
         return isBlank(message) ? message : JavaEscapes.unescapeJava(message);
     }
 
-    public static String translateMessage(String message) {
-        return translateMessage(message, '&');
-    }
-
-    public static String reverseTranslateMessage(String message, char colorChar) {
-        return isBlank(message) ? message : JavaEscapes.escapeJava(COLOR_CODE_PATTERN.matcher(message).replaceAll(colorChar + "$1"));
-    }
-
     public static String reverseTranslateMessage(String message) {
-        return reverseTranslateMessage(message, '&');
-    }
-
-    public static String[] translateArguments(String[] args, char colorChar) {
-        return Arrays.stream(args)
-                .map(s -> colorChar == '&'
-                        ? ARGUMENT_COLOR_PATTERN.matcher(s).replaceAll("§$1")
-                        : Pattern.compile("(?i)" + Pattern.quote(String.valueOf(colorChar)) + "([0-9a-fk-or])")
-                                .matcher(s).replaceAll("§$1"))
-                .toArray(String[]::new);
-    }
-
-    public static String[] translateArguments(String[] args) {
-        return translateArguments(args, '&');
+        return isBlank(message) ? message : JavaEscapes.escapeJava(message);
     }
 
     public static String formatDuration(long millis) {

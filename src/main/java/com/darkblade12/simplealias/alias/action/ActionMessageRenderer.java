@@ -25,18 +25,14 @@ final class ActionMessageRenderer {
     }
 
     static Component render(String template, SimpleAlias plugin, CommandSender sender,
-                            Player viewer, String[] params, boolean translateArguments) {
+                            Player viewer, String[] params) {
         Matcher matcher = TOKENS.matcher(template);
         Map<String, Component> values = new LinkedHashMap<>();
         StringBuilder formatted = new StringBuilder(template.length());
         while (matcher.find()) {
             String token = matcher.group();
             String replacement = resolve(token, plugin, sender, viewer, params);
-            boolean isArgument = token.equalsIgnoreCase("<params>")
-                    || token.regionMatches(true, 0, "<params@", 0, 8);
-            Component value = isArgument && !translateArguments
-                    ? Component.text(replacement)
-                    : TextFormat.external(replacement);
+            Component value = TextFormat.external(replacement);
             String key = "armavalue" + values.size();
             values.put(key, value);
             matcher.appendReplacement(formatted, Matcher.quoteReplacement("<" + key + ">"));
