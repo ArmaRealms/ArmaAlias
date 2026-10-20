@@ -522,10 +522,6 @@ public final class Alias implements Nameable {
         VaultHook vault = plugin.getVaultHook();
         if (costEnabled && !Permission.BYPASS_COST.test(sender) && !vault.withdrawPlayer(player, costAmount)) {
             if (!MessageUtils.isBlank(costMessage)) {
-                Replacer replacer = Replacer.builder()
-                                            .with(DynamicVariable.COST_AMOUNT, vault.formatCurrency(costAmount))
-                                            .with(DynamicVariable.MONEY_BALANCE, vault.formatCurrency(vault.getBalance(player)))
-                                            .build();
                 player.sendMessage(TextFormat.render(
                             costMessage.replace("<cost_amount>", "<armavalue0>")
                                     .replace("<money_balance>", "<armavalue1>"),

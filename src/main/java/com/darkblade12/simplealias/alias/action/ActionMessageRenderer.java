@@ -1,7 +1,6 @@
 package com.darkblade12.simplealias.alias.action;
 
 import com.darkblade12.simplealias.SimpleAlias;
-import com.darkblade12.simplealias.alias.DynamicVariable;
 import com.darkblade12.simplealias.plugin.hook.PlaceholderHook;
 import com.darkblade12.simplealias.plugin.hook.VaultHook;
 import com.darkblade12.simplealias.util.TextFormat;
@@ -17,7 +16,7 @@ import java.util.regex.Pattern;
 /** Compiles a configured alias message with opaque components for all dynamic values. */
 final class ActionMessageRenderer {
     private static final Pattern TOKENS = Pattern.compile(
-            "(?i)%[a-z0-9_]+%|\\{viewer:[a-z0-9_]+\\}|<sender_name>|<sender_uuid>|"
+            "(?i)%[^%\\s]{1,200}%|\\{viewer:[a-z0-9_]+\\}|<sender_name>|<sender_uuid>|"
             + "<world_name>|<money_balance>|<group_name>|<params>|"
             + "<params@(?:\\d+|\\d*-\\d+|\\d+-\\d*)>|<alias_name>|<param_count>|"
             + "<remaining_time>|<cost_amount>");

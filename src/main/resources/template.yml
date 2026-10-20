@@ -63,6 +63,10 @@ General_Settings:
       # Color codes have to start with '&'
       Translate_Color_Codes: false
 
+      # Messages use Adventure Components: <green>, <bold>, <#55ff99> and other MiniMessage tags.
+      # Existing &a, §a, &l, &r and RGB codes still work.
+      # PlaceholderAPI values with old &/§ colors are interpreted; returned MiniMessage
+      # is inserted as literal text (it cannot become a click/hover event).
       # This message can contain normal PlaceholderAPI placeholders for the executor:
       # %player_name% -> player who ran the alias (also when broadcasting).
       # %rel_<expansion>_<key>% -> relationship between executor and each viewer.

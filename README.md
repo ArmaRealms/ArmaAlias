@@ -76,16 +76,16 @@ multiple viewers, no-player console invocations, and reload of PAPI expansions.
 
 ## Adventure / MiniMessage formatting
 
-All player-facing messages now use Paper Adventure \`Component\` output.
+All player-facing messages now use Paper Adventure `Component` output.
 Configured alias messages, failure messages and language bundles accept
-\`<green>\`, \`<#aabbcc>\`, \`<bold>\` and other MiniMessage tags. Existing
-\`&a\`, \`§a\`, \`&l\`, \`&r\`, \`&#aabbcc\`, and RGB \`§x§a§a§b§b§c§c\`
+`<green>`, `<#aabbcc>`, `<bold>` and other MiniMessage tags. Existing
+`&a`, `§a`, `&l`, `&r`, `&#aabbcc`, and RGB `§x§a§a§b§b§c§c`
 codes still render.
 
 Dynamic values from PlaceholderAPI and alias parameters are inserted as
 component placeholders, not reparsed as MiniMessage: text such as
-\`<click:run_command:/...>\` returned by an expansion remains visible text
-instead of creating a click event. If PAPI returns \`&a\` or \`§a\` its
+`<click:run_command:/...>` returned by an expansion remains visible text
+instead of creating a click event. If PAPI returns `&a` or `§a` its
 color formatting is interpreted using the Adventure legacy serializer.
 Ordinary command actions remain **plain command strings**, preserving
 compatibility with Minecraft command syntax.
