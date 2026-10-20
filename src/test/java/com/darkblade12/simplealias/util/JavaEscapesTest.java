@@ -7,7 +7,7 @@ public final class JavaEscapesTest {
         check("A", JavaEscapes.unescapeJava("\\101"), "octal");
         check("água", JavaEscapes.unescapeJava("\\u00e1gua"), "Unicode");
         check("A", JavaEscapes.unescapeJava("\\uuuu0041"), "repeated Unicode prefix");
-        check("unknown", JavaEscapes.unescapeJava("unk\\nown"), "unknown escape");
+        check("unkxnown", JavaEscapes.unescapeJava("unk\\xnown"), "unknown escape");
         check("line\\nbreak", JavaEscapes.escapeJava("line\nbreak"), "escaped line");
         check("quote\\\" and \\\\ slash", JavaEscapes.escapeJava("quote\" and \\ slash"), "quote and slash");
         String original = "á § \t \r \n \" \\ ";
