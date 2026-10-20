@@ -29,23 +29,25 @@ public final class MessageAction extends Action {
     @Override
     public void execute(SimpleAlias plugin, CommandSender sender, String[] params) {
         PlaceholderHook placeholders = plugin.getPlaceholderHook();
-        // Parse the actor context before <params> substitution. Viewers are resolved separately.
-        String text = replaceVariables(placeholders.parseActor(sender, message), plugin, sender, params);
+        // Resolve configured placeholders before <params> so player input is never parsed as PAPI markup.
+        String template = placeholders.parseActor(sender, message);
         if (broadcast) {
-            if (!placeholders.needsViewerContext(text)) {
-                Bukkit.broadcastMessage(text);
+            if (!placeholders.needsViewerContext(template)) {
+                Bukkit.broadcastMessage(replaceVariables(template, plugin, sender, params));
                 return;
             }
 
             for (Player viewer : Bukkit.getOnlinePlayers()) {
-                viewer.sendMessage(placeholders.parseViewer(sender, viewer, text));
+                String personalized = placeholders.parseViewer(sender, viewer, template);
+                viewer.sendMessage(replaceVariables(personalized, plugin, sender, params));
             }
-            // The console is not a Player: relational and viewer placeholders cannot be evaluated for it.
-            Bukkit.getConsoleSender().sendMessage(text);
+            // Console has no viewer context: log the actor-only version.
+            Bukkit.getConsoleSender().sendMessage(replaceVariables(template, plugin, sender, params));
         } else if (sender instanceof Player viewer) {
-            sender.sendMessage(placeholders.parseViewer(sender, viewer, text));
+            String personalized = placeholders.parseViewer(sender, viewer, template);
+            sender.sendMessage(replaceVariables(personalized, plugin, sender, params));
         } else {
-            sender.sendMessage(text);
+            sender.sendMessage(replaceVariables(template, plugin, sender, params));
         }
     }
 
