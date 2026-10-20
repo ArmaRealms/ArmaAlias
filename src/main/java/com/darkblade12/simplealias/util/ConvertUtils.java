@@ -39,10 +39,10 @@ public final class ConvertUtils {
         return String.join(String.valueOf(separator), java.util.Arrays.copyOfRange(values, start, end));
     }
 
-    public static String join(Iterable<String> values, String separator) {
+    public static String join(Iterable<?> values, String separator) {
         java.util.StringJoiner joiner = new java.util.StringJoiner(separator);
-        for (String value : values) {
-            joiner.add(value == null ? "" : value);
+        for (Object value : values) {
+            joiner.add(value == null ? "" : value.toString());
         }
         return joiner.toString();
     }
