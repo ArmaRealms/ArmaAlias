@@ -1,7 +1,6 @@
 package com.darkblade12.simplealias.util;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import java.util.Map;
 
@@ -21,8 +20,8 @@ public final class TextFormatTest {
                 Map.of("armavalue0", TextFormat.external("&a<click:run_command:/op>malicious")));
         check("Hello <click:run_command:/op>malicious",
                 PlainTextComponentSerializer.plainText().serialize(output), "safe external input");
-        if (MiniMessage.miniMessage().serialize(output).contains("run_command")) {
-            throw new AssertionError("external MiniMessage injection turned into an event");
+        if (hasClickEvent(output)) {
+            throw new AssertionError("external MiniMessage injection turned into a click event");
         }
 
         Component legacy = TextFormat.external("§aGreen &cRed");
@@ -30,6 +29,13 @@ public final class TextFormatTest {
         if (!MiniMessage.miniMessage().serialize(legacy).contains("red")) {
             throw new AssertionError("legacy red color was not preserved");
         }
+    }
+
+    private static boolean hasClickEvent(Component component) {
+        if (component.clickEvent() != null) {
+            return true;
+        }
+        return component.children().stream().anyMatch(TextFormatTest::hasClickEvent);
     }
 
     private static void check(String expected, String actual, String caseName) {
