@@ -19,6 +19,8 @@ import com.darkblade12.simplealias.plugin.settings.SettingInfo;
 import com.darkblade12.simplealias.replacer.Replacer;
 import com.darkblade12.simplealias.util.ConvertUtils;
 import com.darkblade12.simplealias.util.MessageUtils;
+import com.darkblade12.simplealias.util.TextFormat;
+import net.kyori.adventure.text.Component;
 import com.darkblade12.simplealias.util.ConvertUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -460,7 +462,7 @@ public final class Alias implements Nameable {
     public void execute(final CommandSender sender, final String[] params) {
         if (sender instanceof ConsoleCommandSender && !executableAsConsole) {
             if (!MessageUtils.isBlank(consoleMessage)) {
-                sender.sendMessage(consoleMessage);
+                sender.sendMessage(TextFormat.render(consoleMessage));
             }
             return;
         }
@@ -476,14 +478,14 @@ public final class Alias implements Nameable {
 
         if (!testPermission(sender)) {
             if (!MessageUtils.isBlank(permissionMessage)) {
-                sender.sendMessage(permissionMessage);
+                sender.sendMessage(TextFormat.render(permissionMessage));
             }
             return;
         }
 
         if (usageCheckEnabled && (params.length < usageCheckMinParams || usageCheckMaxParams >= 0 && params.length > usageCheckMaxParams)) {
             if (!MessageUtils.isBlank(usageCheckMessage)) {
-                sender.sendMessage(usageCheckMessage);
+                sender.sendMessage(TextFormat.render(usageCheckMessage));
             }
             return;
         }
@@ -496,7 +498,7 @@ public final class Alias implements Nameable {
         final Player player = (Player) sender;
         if (!isEnabled(player.getWorld()) && !Permission.BYPASS_ENABLED_WORLDS.test(player)) {
             if (!MessageUtils.isBlank(worldMessage)) {
-                player.sendMessage(worldMessage);
+                player.sendMessage(TextFormat.render(worldMessage));
             }
             return;
         }
@@ -507,7 +509,9 @@ public final class Alias implements Nameable {
         if (cooldown != null) {
             if (!cooldown.isExpired()) {
                 if (cooldownMessage != null && !cooldownMessage.isEmpty()) {
-                    player.sendMessage(cooldownMessage.replace("<remaining_time>", cooldown.toString()));
+                    player.sendMessage(TextFormat.render(
+                            cooldownMessage.replace("<remaining_time>", "<armavalue0>"),
+                            Map.of("armavalue0", Component.text(cooldown.toString()))));
                 }
                 return;
             }
@@ -522,7 +526,11 @@ public final class Alias implements Nameable {
                                             .with(DynamicVariable.COST_AMOUNT, vault.formatCurrency(costAmount))
                                             .with(DynamicVariable.MONEY_BALANCE, vault.formatCurrency(vault.getBalance(player)))
                                             .build();
-                player.sendMessage(replacer.replaceAll(costMessage));
+                player.sendMessage(TextFormat.render(
+                            costMessage.replace("<cost_amount>", "<armavalue0>")
+                                    .replace("<money_balance>", "<armavalue1>"),
+                            Map.of("armavalue0", TextFormat.external(vault.formatCurrency(costAmount)),
+                                    "armavalue1", TextFormat.external(vault.formatCurrency(vault.getBalance(player))))));
             }
             return;
         }
@@ -548,7 +556,9 @@ public final class Alias implements Nameable {
 
         String remainingTime = MessageUtils.formatDuration(delayDuration * 1000);
         if (!MessageUtils.isBlank(delayMessage)) {
-            sender.sendMessage(DynamicVariable.REMAINING_TIME.replaceAll(delayMessage, remainingTime));
+            sender.sendMessage(TextFormat.render(
+                    delayMessage.replace("<remaining_time>", "<armavalue0>"),
+                    Map.of("armavalue0", Component.text(remainingTime))));
         }
 
         new BukkitRunnable() {
@@ -577,7 +587,7 @@ public final class Alias implements Nameable {
                         execution.cancel();
 
                         if (delayCancelMessage != null && !delayCancelMessage.isEmpty()) {
-                            player.sendMessage(delayCancelMessage);
+                            player.sendMessage(TextFormat.render(delayCancelMessage));
                         }
                     }
                 }

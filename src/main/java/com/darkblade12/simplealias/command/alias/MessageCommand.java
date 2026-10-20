@@ -10,7 +10,6 @@ import com.darkblade12.simplealias.plugin.command.CommandBase;
 import com.darkblade12.simplealias.plugin.settings.InvalidValueException;
 import com.darkblade12.simplealias.util.JavaEscapes;
 import com.darkblade12.simplealias.util.ConvertUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -42,7 +41,7 @@ public final class MessageCommand extends CommandBase<SimpleAlias> {
         }
 
         String[] messageParts = Arrays.copyOfRange(args, 1, args.length);
-        String message = ChatColor.translateAlternateColorCodes('&', JavaEscapes.unescapeJava(ConvertUtils.join(messageParts, ' ')));
+        String message = JavaEscapes.unescapeJava(ConvertUtils.join(messageParts, ' '));
 
         MessageAction action = new MessageAction("DisplayMessage", message);
         alias.setActions(action);

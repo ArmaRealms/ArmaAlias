@@ -29,25 +29,20 @@ public final class MessageAction extends Action {
     @Override
     public void execute(SimpleAlias plugin, CommandSender sender, String[] params) {
         PlaceholderHook placeholders = plugin.getPlaceholderHook();
-        // Resolve configured placeholders before <params> so player input is never parsed as PAPI markup.
-        String template = placeholders.parseActor(sender, message);
         if (broadcast) {
-            if (!placeholders.needsViewerContext(template)) {
-                Bukkit.broadcastMessage(replaceVariables(template, plugin, sender, params));
+            if (!placeholders.needsViewerContext(message)) {
+                Bukkit.broadcast(ActionMessageRenderer.render(message, plugin, sender, null, params, translateColorCodes));
                 return;
             }
 
             for (Player viewer : Bukkit.getOnlinePlayers()) {
-                String personalized = placeholders.parseViewer(sender, viewer, template);
-                viewer.sendMessage(replaceVariables(personalized, plugin, sender, params));
+                viewer.sendMessage(ActionMessageRenderer.render(message, plugin, sender, viewer, params, translateColorCodes));
             }
-            // Console has no viewer context: log the actor-only version.
-            Bukkit.getConsoleSender().sendMessage(replaceVariables(template, plugin, sender, params));
-        } else if (sender instanceof Player viewer) {
-            String personalized = placeholders.parseViewer(sender, viewer, template);
-            sender.sendMessage(replaceVariables(personalized, plugin, sender, params));
+            Bukkit.getConsoleSender().sendMessage(
+                    ActionMessageRenderer.render(message, plugin, sender, null, params, translateColorCodes));
         } else {
-            sender.sendMessage(replaceVariables(template, plugin, sender, params));
+            Player viewer = sender instanceof Player player ? player : null;
+            sender.sendMessage(ActionMessageRenderer.render(message, plugin, sender, viewer, params, translateColorCodes));
         }
     }
 

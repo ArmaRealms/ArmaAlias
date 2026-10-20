@@ -1,6 +1,10 @@
 package com.darkblade12.simplealias.plugin;
 
 import org.bukkit.command.CommandSender;
+import com.darkblade12.simplealias.util.TextFormat;
+import net.kyori.adventure.text.Component;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -118,8 +122,21 @@ public abstract class PluginBase extends JavaPlugin {
         return messageManager.formatMessage(key, args);
     }
 
+    public final Component formatComponent(String key, Object... args) {
+        Map<String, Component> values = new LinkedHashMap<>();
+        Object[] tokens = new Object[args.length];
+        for (int i = 0; i < args.length; i++) {
+            String id = "armavalue" + i;
+            values.put(id, args[i] instanceof Component component
+                    ? component : TextFormat.external(String.valueOf(args[i] == null ? "" : args[i])));
+            tokens[i] = "<" + id + ">";
+        }
+        return TextFormat.render(messageManager.formatMessage(key, tokens), values);
+    }
+
     public final void sendMessage(CommandSender sender, String key, Object... args) {
-        sender.sendMessage(getPrefix() + " " + messageManager.formatMessage(key, args));
+        sender.sendMessage(TextFormat.render(getPrefix()).append(Component.space())
+                .append(formatComponent(key, args)));
     }
 
     public void copyResource(String resourcePath, File outputFile, boolean replace) throws IOException {

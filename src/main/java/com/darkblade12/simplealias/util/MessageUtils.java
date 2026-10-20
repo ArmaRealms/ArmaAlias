@@ -2,55 +2,17 @@ package com.darkblade12.simplealias.util;
 
 import com.darkblade12.simplealias.util.JavaEscapes;
 import com.darkblade12.simplealias.util.ConvertUtils;
-import org.bukkit.ChatColor;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public final class MessageUtils {
-    private static final Map<ChatColor, ChatColor> SIMILAR_COLORS = new HashMap<>();
-    private static final ChatColor[] COLORS;
-    private static final Random RANDOM = new Random();
     private static final Pattern COLOR_CODE_PATTERN = Pattern.compile("§([0-9a-fk-orx])", Pattern.CASE_INSENSITIVE);
-
-    static {
-        SIMILAR_COLORS.put(ChatColor.DARK_BLUE, ChatColor.BLUE);
-        SIMILAR_COLORS.put(ChatColor.DARK_GREEN, ChatColor.GREEN);
-        SIMILAR_COLORS.put(ChatColor.DARK_AQUA, ChatColor.AQUA);
-        SIMILAR_COLORS.put(ChatColor.DARK_RED, ChatColor.RED);
-        SIMILAR_COLORS.put(ChatColor.DARK_PURPLE, ChatColor.LIGHT_PURPLE);
-        SIMILAR_COLORS.put(ChatColor.DARK_GRAY, ChatColor.GRAY);
-        SIMILAR_COLORS.put(ChatColor.GOLD, ChatColor.YELLOW);
-
-        COLORS = Arrays.stream(ChatColor.values()).filter(c -> c.isColor() && c != ChatColor.BLACK && c != ChatColor.WHITE)
-                       .toArray(ChatColor[]::new);
-    }
+    private static final Pattern ARGUMENT_COLOR_PATTERN = Pattern.compile("(?i)&([0-9a-fk-or])");
 
     private MessageUtils() {
-    }
-
-    public static ChatColor randomColor() {
-        return COLORS[RANDOM.nextInt(COLORS.length)];
-    }
-
-    public static ChatColor similarColor(ChatColor color) {
-        for (Entry<ChatColor, ChatColor> entry : SIMILAR_COLORS.entrySet()) {
-            ChatColor key = entry.getKey();
-            ChatColor value = entry.getValue();
-            if (key == color) {
-                return value;
-            } else if (value == color) {
-                return key;
-            }
-        }
-
-        return color;
     }
 
     public static String formatName(Enum<?> enumObj, boolean capitalize, String delimiter) {
@@ -71,7 +33,7 @@ public final class MessageUtils {
     }
 
     public static String translateMessage(String message, char colorChar) {
-        return isBlank(message) ? message : ChatColor.translateAlternateColorCodes(colorChar, JavaEscapes.unescapeJava(message));
+        return isBlank(message) ? message : JavaEscapes.unescapeJava(message);
     }
 
     public static String translateMessage(String message) {
@@ -87,7 +49,12 @@ public final class MessageUtils {
     }
 
     public static String[] translateArguments(String[] args, char colorChar) {
-        return Arrays.stream(args).map(s -> ChatColor.translateAlternateColorCodes(colorChar, s)).toArray(String[]::new);
+        return Arrays.stream(args)
+                .map(s -> colorChar == '&'
+                        ? ARGUMENT_COLOR_PATTERN.matcher(s).replaceAll("§$1")
+                        : Pattern.compile("(?i)" + Pattern.quote(String.valueOf(colorChar)) + "([0-9a-fk-or])")
+                                .matcher(s).replaceAll("§$1"))
+                .toArray(String[]::new);
     }
 
     public static String[] translateArguments(String[] args) {
