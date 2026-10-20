@@ -8,30 +8,34 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.io.IOException;
 
-/** Regression tests: trusted MiniMessage, both legacy color formats and untrusted PAPI values. */
+/** Regression tests: MiniMessage-only templates and sanitized dynamic values. */
 public final class TextFormatTest {
     public static void main(String[] args) {
-        check("<reset><green>Hello", TextFormat.toMiniMessage("&aHello"), "ampersand colors");
-        check("<reset><red>Alert", TextFormat.toMiniMessage("§cAlert"), "section colors");
-        check("<reset><#aabbcc>Hello", TextFormat.toMiniMessage("&#aabbccHello"), "hex colors");
-        check("<reset><#aabbcc>Hello", TextFormat.toMiniMessage("§x§a§a§b§b§c§cHello"), "bungee rgb");
-        check("<bold>OK<reset>", TextFormat.toMiniMessage("&lOK&r"), "decorations");
+        check("Hello", TextFormat.stripLegacyCodes("&aHello"), "ampersand code stripped");
+        check("Alert", TextFormat.stripLegacyCodes("§cAlert"), "section code stripped");
+        check("Hello", TextFormat.stripLegacyCodes("&#aabbccHello"), "hex code stripped");
+        check("Hello", TextFormat.stripLegacyCodes("§x§a§a§b§b§c§cHello"), "RGB code stripped");
+        check("Hello", TextFormat.stripLegacyCodes("&x&a&a&b&b&c&cHello"), "RGB ampersand stripped");
+        check("A plain & separator", TextFormat.stripLegacyCodes("A plain & separator"), "ordinary ampersand");
+        check("", TextFormat.stripLegacyCodes(null), "null value");
+        check("AB", PlainTextComponentSerializer.plainText().serialize(
+                TextFormat.render("<red>A&aB")), "old code in configured template is discarded");
 
         Component normal = TextFormat.render("<green>Hi <bold>world</bold>");
         check("Hi world", PlainTextComponentSerializer.plainText().serialize(normal), "MiniMessage rendering");
 
         Component output = TextFormat.render("<gold>Hello <armavalue0>",
-                Map.of("armavalue0", TextFormat.external("&a<click:run_command:/op>malicious")));
-        check("Hello <click:run_command:/op>malicious",
-                PlainTextComponentSerializer.plainText().serialize(output), "safe external input");
-        if (hasClickEvent(output)) {
-            throw new AssertionError("external MiniMessage injection turned into a click event");
+                Map.of("armavalue0", TextFormat.external(
+                        "&a§c&#aabbcc§x§a§a§b§b§c§c<click:run_command:/op>unsafe")));
+        check("Hello <click:run_command:/op>unsafe",
+                PlainTextComponentSerializer.plainText().serialize(output), "safe PAPI input");
+        if (hasClickEvent(output) || hasHoverEvent(output)) {
+            throw new AssertionError("external values must not produce MiniMessage events");
         }
-
-        Component legacy = TextFormat.external("§aGreen &cRed");
-        check("Green Red", PlainTextComponentSerializer.plainText().serialize(legacy), "PAPI legacy colors");
-        if (!MiniMessage.miniMessage().serialize(legacy).contains("red")) {
-            throw new AssertionError("legacy red color was not preserved");
+        check("Alice", PlainTextComponentSerializer.plainText().serialize(
+                TextFormat.external("§l&aAlice")), "PAPI legacy styles removed");
+        if (MiniMessage.miniMessage().serialize(TextFormat.external("§l&aAlice")).contains("<bold>")) {
+            throw new AssertionError("external legacy style was rendered instead of stripped");
         }
 
         String commented = readTemplateMessage("src/main/resources/template.yml");
