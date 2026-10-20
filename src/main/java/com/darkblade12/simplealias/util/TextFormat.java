@@ -14,7 +14,7 @@ public final class TextFormat {
     private static final Pattern SECTION_CODES = Pattern.compile(
             "(?i)(?:§x(?:[&§][0-9a-f]){6}|§#[0-9a-f]{6}|§[0-9a-fk-orx])");
     private static final Pattern AMPERSAND_CODES = Pattern.compile(
-            "(?i)(?:&x(?:[&§][0-9a-f]){6}|&#[0-9a-f]{6}"
+            "(?i)(?:(?:&x(?:[&§][0-9a-f]){6}|&#[0-9a-f]{6})(?:&[0-9a-fk-or])*"
             + "|(?<![\\p{L}\\p{N}])(?:&[0-9a-fk-or])+)");
 
 
