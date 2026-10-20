@@ -174,6 +174,11 @@ final class ConsoleProxy implements ConsoleCommandSender {
     }
 
     @Override
+    public void sendRawMessage(UUID sender, String message) {
+        sendRawMessage(message);
+    }
+
+    @Override
     public void sendRawMessage(String message) {
         if (!silent && source instanceof Conversable) {
             ((Conversable) source).sendRawMessage(message);
