@@ -11,7 +11,7 @@ import com.darkblade12.simplealias.plugin.command.CommandBase;
 import com.darkblade12.simplealias.plugin.hook.VaultHook;
 import com.darkblade12.simplealias.util.ConvertUtils;
 import com.darkblade12.simplealias.util.MessageUtils;
-import org.apache.commons.lang.StringUtils;
+import com.darkblade12.simplealias.util.ConvertUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -30,7 +30,7 @@ public final class ModifyCommand extends CommandBase<SimpleAlias> {
 
     @Override
     public void execute(SimpleAlias plugin, CommandSender sender, String label, String[] args) {
-        String name = StringUtils.removeStart(args[0], "/");
+        String name = ConvertUtils.removeStart(args[0], "/");
         Alias alias = plugin.getAliasManager().getAlias(name);
         if (alias == null) {
             plugin.sendMessage(sender, "alias.notFound", name);
@@ -56,7 +56,7 @@ public final class ModifyCommand extends CommandBase<SimpleAlias> {
             return;
         }
 
-        String value = StringUtils.join(args, ' ', 3, args.length);
+        String value = ConvertUtils.join(args, ' ', 3, args.length);
         boolean add = operation == ModifyOperation.ADD;
         boolean empty = ConvertUtils.isEmpty(value);
         if (empty) {
@@ -108,7 +108,7 @@ public final class ModifyCommand extends CommandBase<SimpleAlias> {
                             newValues++;
                         }
                     }
-                    value = StringUtils.join(enabledWorlds, ", ");
+                    value = ConvertUtils.join(enabledWorlds, ", ");
 
                     if (add && newValues == 0) {
                         plugin.sendMessage(sender, "value.noNewValues", value, settingKey);
@@ -139,7 +139,7 @@ public final class ModifyCommand extends CommandBase<SimpleAlias> {
                     executionOrder.add(action.getName());
                 }
 
-                value = StringUtils.join(executionOrder, ", ");
+                value = ConvertUtils.join(executionOrder, ", ");
                 alias.setExecutionOrder(executionOrder);
                 break;
             case USAGE_CHECK_ENABLED:
@@ -231,7 +231,7 @@ public final class ModifyCommand extends CommandBase<SimpleAlias> {
                             newValues++;
                         }
                     }
-                    value = StringUtils.join(permissionGroups, ", ");
+                    value = ConvertUtils.join(permissionGroups, ", ");
 
                     if (add && newValues == 0) {
                         plugin.sendMessage(sender, "value.noNewValues", value, settingKey);

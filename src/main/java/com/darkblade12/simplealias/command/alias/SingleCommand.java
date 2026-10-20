@@ -7,7 +7,7 @@ import com.darkblade12.simplealias.alias.AliasException;
 import com.darkblade12.simplealias.alias.AliasManager;
 import com.darkblade12.simplealias.alias.action.CommandAction;
 import com.darkblade12.simplealias.plugin.command.CommandBase;
-import org.apache.commons.lang.StringUtils;
+import com.darkblade12.simplealias.util.ConvertUtils;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -19,7 +19,7 @@ public final class SingleCommand extends CommandBase<SimpleAlias> {
 
     @Override
     public void execute(SimpleAlias plugin, CommandSender sender, String label, String[] args) {
-        String name = StringUtils.removeStart(args[0], "/");
+        String name = ConvertUtils.removeStart(args[0], "/");
         AliasManager manager = plugin.getAliasManager();
         if (manager.hasAlias(name)) {
             plugin.sendMessage(sender, "alias.alreadyExists", name);
@@ -27,13 +27,13 @@ public final class SingleCommand extends CommandBase<SimpleAlias> {
         } else if (!Alias.isValid(name)) {
             plugin.sendMessage(sender, "alias.invalidName", name);
             return;
-        } else if (StringUtils.removeStart(args[1], "/").equalsIgnoreCase(name)) {
+        } else if (ConvertUtils.removeStart(args[1], "/").equalsIgnoreCase(name)) {
             plugin.sendMessage(sender, "alias.noSelfExecution");
             return;
         }
 
         String[] commandParts = Arrays.copyOfRange(args, 1, args.length);
-        String command = StringUtils.removeStart(StringUtils.join(commandParts, ' '), "/");
+        String command = ConvertUtils.removeStart(ConvertUtils.join(commandParts, ' '), "/");
         Alias alias;
         try {
             alias = manager.createAlias(name);

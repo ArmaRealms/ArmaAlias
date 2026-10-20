@@ -6,7 +6,7 @@ import com.darkblade12.simplealias.alias.Alias;
 import com.darkblade12.simplealias.alias.AliasException;
 import com.darkblade12.simplealias.plugin.command.CommandBase;
 import com.darkblade12.simplealias.plugin.settings.InvalidValueException;
-import org.apache.commons.lang.StringUtils;
+import com.darkblade12.simplealias.util.ConvertUtils;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public final class ReloadCommand extends CommandBase<SimpleAlias> {
             return;
         }
 
-        String name = StringUtils.removeStart(args[0], "/");
+        String name = ConvertUtils.removeStart(args[0], "/");
         Alias alias = plugin.getAliasManager().getAlias(name);
         if (alias == null) {
             plugin.sendMessage(sender, "alias.notFound", name);

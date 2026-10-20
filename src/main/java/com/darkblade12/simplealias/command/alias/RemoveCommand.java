@@ -6,7 +6,7 @@ import com.darkblade12.simplealias.alias.Alias;
 import com.darkblade12.simplealias.alias.AliasException;
 import com.darkblade12.simplealias.alias.AliasManager;
 import com.darkblade12.simplealias.plugin.command.CommandBase;
-import org.apache.commons.lang.StringUtils;
+import com.darkblade12.simplealias.util.ConvertUtils;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
@@ -18,7 +18,7 @@ public final class RemoveCommand extends CommandBase<SimpleAlias> {
 
     @Override
     public void execute(SimpleAlias plugin, CommandSender sender, String label, String[] args) {
-        String name = StringUtils.removeStart(args[0], "/");
+        String name = ConvertUtils.removeStart(args[0], "/");
         AliasManager manager = plugin.getAliasManager();
         Alias alias = manager.getAlias(name);
         if (alias == null) {
