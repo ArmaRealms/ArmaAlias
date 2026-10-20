@@ -1,6 +1,6 @@
 package com.darkblade12.simplealias.plugin;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import com.darkblade12.simplealias.util.JavaEscapes;
 import org.bukkit.ChatColor;
 
 import java.text.MessageFormat;
@@ -43,7 +43,7 @@ public class MessageManager extends Manager<PluginBase> {
         MessageFormat format = messageCache.get(key);
         if (format == null) {
             try {
-                String message = StringEscapeUtils.unescapeJava(bundle.getString(key));
+                String message = JavaEscapes.unescapeJava(bundle.getString(key));
                 format = new MessageFormat(ChatColor.translateAlternateColorCodes('&', message));
                 messageCache.put(key, format);
             } catch (MissingResourceException e) {

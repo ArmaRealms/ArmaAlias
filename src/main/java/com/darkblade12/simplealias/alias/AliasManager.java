@@ -8,7 +8,7 @@ import com.darkblade12.simplealias.plugin.reader.ConfigurationReader;
 import com.darkblade12.simplealias.plugin.settings.InvalidValueException;
 import com.darkblade12.simplealias.settings.Settings;
 import com.darkblade12.simplealias.util.MessageUtils;
-import org.apache.commons.lang.StringUtils;
+import com.darkblade12.simplealias.util.ConvertUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -95,7 +95,7 @@ public final class AliasManager extends Manager<SimpleAlias> {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
-        String[] commandParts = StringUtils.removeStart(event.getMessage(), "/").split(" ");
+        String[] commandParts = ConvertUtils.removeStart(event.getMessage(), "/").split(" ");
         String command = commandParts[0].toLowerCase();
         Player player = event.getPlayer();
         UUID id = player.getUniqueId();

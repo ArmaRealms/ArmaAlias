@@ -15,3 +15,5 @@ jobs:
           cache: maven
       - name: Verify
         run: mvn -B -ntp --no-transfer-progress clean verify
+      - name: Test Java string escaping without external libraries
+        run: java --class-path target/classes src/test/java/com/darkblade12/simplealias/util/JavaEscapesTest.java

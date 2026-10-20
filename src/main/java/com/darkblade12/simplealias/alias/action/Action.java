@@ -6,7 +6,7 @@ import com.darkblade12.simplealias.nameable.Nameable;
 import com.darkblade12.simplealias.plugin.hook.VaultHook;
 import com.darkblade12.simplealias.replacer.Replacer;
 import com.darkblade12.simplealias.util.MessageUtils;
-import org.apache.commons.lang.StringUtils;
+import com.darkblade12.simplealias.util.ConvertUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -63,7 +63,7 @@ public abstract class Action implements Nameable, Comparable<Action> {
         }
 
         if (params.length > 0) {
-            builder.with(DynamicVariable.PARAMS, StringUtils.join(params, " "));
+            builder.with(DynamicVariable.PARAMS, ConvertUtils.join(params, " "));
 
             Matcher matcher = DynamicVariable.PARAMS_INDEX.getPattern().matcher(target);
             while (matcher.find()) {
@@ -90,7 +90,7 @@ public abstract class Action implements Nameable, Comparable<Action> {
                     builder.with(variable, params[rangeStart]);
                 } else if (rangeStart < rangeEnd) {
                     String[] includedParams = Arrays.copyOfRange(params, rangeStart, Math.min(rangeEnd, params.length) + 1);
-                    builder.with(variable, StringUtils.join(includedParams, " "));
+                    builder.with(variable, ConvertUtils.join(includedParams, " "));
                 }
             }
         }

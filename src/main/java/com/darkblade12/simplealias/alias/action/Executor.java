@@ -2,7 +2,7 @@ package com.darkblade12.simplealias.alias.action;
 
 import com.darkblade12.simplealias.SimpleAlias;
 import com.darkblade12.simplealias.alias.AliasCommand;
-import org.apache.commons.lang.StringUtils;
+import com.darkblade12.simplealias.util.ConvertUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -43,7 +43,7 @@ public enum Executor {
             PlayerCommandPreprocessEvent event = new PlayerCommandPreprocessEvent(player, "/" + command);
             Bukkit.getPluginManager().callEvent(event);
             if (!event.isCancelled()) {
-                String commandLine = StringUtils.removeStart(event.getMessage(), "/");
+                String commandLine = ConvertUtils.removeStart(event.getMessage(), "/");
                 if (AliasCommand.isVanillaCommand(commandLine.split(" ")[0])) {
                     Bukkit.dispatchCommand(new ConsoleProxy(sender, grantPermission, silent), commandLine);
                 } else {

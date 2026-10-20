@@ -4,7 +4,6 @@ import com.darkblade12.simplealias.alias.AliasSection;
 import com.darkblade12.simplealias.alias.ModifyOperation;
 import com.darkblade12.simplealias.plugin.settings.SettingInfo;
 import com.darkblade12.simplealias.util.MessageUtils;
-import org.apache.commons.lang.NullArgumentException;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,7 +49,7 @@ public enum ActionSetting implements SettingInfo {
 
     public static void registerName(String name, ActionSetting setting) {
         if (setting == null) {
-            throw new NullArgumentException("setting");
+            throw new IllegalArgumentException("setting must not be null");
         }
 
         String key = name.toLowerCase();

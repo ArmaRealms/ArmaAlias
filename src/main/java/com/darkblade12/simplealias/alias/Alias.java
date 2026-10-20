@@ -19,7 +19,7 @@ import com.darkblade12.simplealias.plugin.settings.SettingInfo;
 import com.darkblade12.simplealias.replacer.Replacer;
 import com.darkblade12.simplealias.util.ConvertUtils;
 import com.darkblade12.simplealias.util.MessageUtils;
-import org.apache.commons.lang.StringUtils;
+import com.darkblade12.simplealias.util.ConvertUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -302,7 +302,7 @@ public final class Alias implements Nameable {
                         throw new InvalidValueException(commandPath, "no value set");
                     }
 
-                    command = StringUtils.removeStart(command, "/");
+                    command = ConvertUtils.removeStart(command, "/");
                     if (command.split(" ")[0].equalsIgnoreCase(name)) {
                         throw new InvalidValueException(commandPath, command, "alias cannot execute itself");
                     }
@@ -328,7 +328,7 @@ public final class Alias implements Nameable {
                     List<String> lines = section.getStringList(ActionSetting.MESSAGE.getPath());
                     String message;
                     if (!lines.isEmpty()) {
-                        message = StringUtils.join(lines, "\n§r");
+                        message = ConvertUtils.join(lines, "\n§r");
                     } else {
                         message = section.getString(ActionSetting.MESSAGE.getPath());
                         if (MessageUtils.isBlank(message)) {
@@ -468,7 +468,7 @@ public final class Alias implements Nameable {
         if (loggingEnabled && !MessageUtils.isBlank(loggingMessage)) {
             Replacer replacer = Replacer.builder()
                                         .with(DynamicVariable.ALIAS_NAME, name)
-                                        .with(DynamicVariable.PARAMS, StringUtils.join(params, " "))
+                                        .with(DynamicVariable.PARAMS, ConvertUtils.join(params, " "))
                                         .with(DynamicVariable.SENDER_NAME, sender.getName())
                                         .build();
             plugin.getLogger().info(replacer.replaceAll(loggingMessage));

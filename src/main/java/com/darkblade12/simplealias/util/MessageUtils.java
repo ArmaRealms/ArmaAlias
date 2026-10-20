@@ -1,7 +1,7 @@
 package com.darkblade12.simplealias.util;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
+import com.darkblade12.simplealias.util.JavaEscapes;
+import com.darkblade12.simplealias.util.ConvertUtils;
 import org.bukkit.ChatColor;
 
 import java.util.Arrays;
@@ -55,7 +55,7 @@ public final class MessageUtils {
 
     public static String formatName(Enum<?> enumObj, boolean capitalize, String delimiter) {
         String[] split = enumObj.name().toLowerCase().split("_");
-        return Arrays.stream(split).map(s -> capitalize ? StringUtils.capitalize(s) : s).collect(Collectors.joining(delimiter));
+        return Arrays.stream(split).map(s -> capitalize && !s.isEmpty() ? Character.toTitleCase(s.charAt(0)) + s.substring(1) : s).collect(Collectors.joining(delimiter));
     }
 
     public static String formatName(Enum<?> enumObj, boolean capitalize) {
@@ -71,7 +71,7 @@ public final class MessageUtils {
     }
 
     public static String translateMessage(String message, char colorChar) {
-        return isBlank(message) ? message : ChatColor.translateAlternateColorCodes(colorChar, StringEscapeUtils.unescapeJava(message));
+        return isBlank(message) ? message : ChatColor.translateAlternateColorCodes(colorChar, JavaEscapes.unescapeJava(message));
     }
 
     public static String translateMessage(String message) {
@@ -79,7 +79,7 @@ public final class MessageUtils {
     }
 
     public static String reverseTranslateMessage(String message, char colorChar) {
-        return isBlank(message) ? message : StringEscapeUtils.escapeJava(COLOR_CODE_PATTERN.matcher(message).replaceAll(colorChar + "$1"));
+        return isBlank(message) ? message : JavaEscapes.escapeJava(COLOR_CODE_PATTERN.matcher(message).replaceAll(colorChar + "$1"));
     }
 
     public static String reverseTranslateMessage(String message) {
