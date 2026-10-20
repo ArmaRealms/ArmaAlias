@@ -12,8 +12,8 @@ import java.util.regex.Pattern;
 public final class TextFormat {
     private static final MiniMessage MINI = MiniMessage.miniMessage();
     private static final Pattern LEGACY_CODES = Pattern.compile(
-            "(?i)(?:§x(?:[&§][0-9a-f]){6}|(?<![\\p{L}\\p{N}])&x(?:[&§][0-9a-f]){6}"
-            + "|§#[0-9a-f]{6}|(?<![\\p{L}\\p{N}])&#[0-9a-f]{6}"
+            "(?i)(?:§x(?:[&§][0-9a-f]){6}|&x(?:[&§][0-9a-f]){6}"
+            + "|§#[0-9a-f]{6}|&#[0-9a-f]{6}"
             + "|§[0-9a-fk-orx]|(?<![\\p{L}\\p{N}])&[0-9a-fk-orx])");
 
     private TextFormat() {
