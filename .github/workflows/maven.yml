@@ -17,3 +17,5 @@ jobs:
         run: mvn -B -ntp --no-transfer-progress clean verify
       - name: Test Java string escaping without external libraries
         run: java --class-path target/classes src/test/java/com/darkblade12/simplealias/util/JavaEscapesTest.java
+      - name: Test viewer placeholder tokens
+        run: java --class-path target/classes src/test/java/com/darkblade12/simplealias/util/ViewerPlaceholdersTest.java

@@ -3,6 +3,8 @@ package com.darkblade12.simplealias.alias.action;
 import com.darkblade12.simplealias.SimpleAlias;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import com.darkblade12.simplealias.plugin.hook.PlaceholderHook;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,11 +28,24 @@ public final class MessageAction extends Action {
 
     @Override
     public void execute(SimpleAlias plugin, CommandSender sender, String[] params) {
-        String message = replaceVariables(this.message, plugin, sender, params);
+        PlaceholderHook placeholders = plugin.getPlaceholderHook();
+        // Parse the actor context before <params> substitution. Viewers are resolved separately.
+        String text = replaceVariables(placeholders.parseActor(sender, message), plugin, sender, params);
         if (broadcast) {
-            Bukkit.broadcastMessage(message);
+            if (!placeholders.needsViewerContext(text)) {
+                Bukkit.broadcastMessage(text);
+                return;
+            }
+
+            for (Player viewer : Bukkit.getOnlinePlayers()) {
+                viewer.sendMessage(placeholders.parseViewer(sender, viewer, text));
+            }
+            // The console is not a Player: relational and viewer placeholders cannot be evaluated for it.
+            Bukkit.getConsoleSender().sendMessage(text);
+        } else if (sender instanceof Player viewer) {
+            sender.sendMessage(placeholders.parseViewer(sender, viewer, text));
         } else {
-            sender.sendMessage(message);
+            sender.sendMessage(text);
         }
     }
 

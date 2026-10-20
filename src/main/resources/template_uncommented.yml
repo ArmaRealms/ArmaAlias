@@ -22,7 +22,9 @@ General_Settings:
       # Enabled_Params: example@0
       Priority: 0
       Translate_Color_Codes: false
-      Text: '&cThis alias has not been setup yet!'
+      Message: '&cThis alias has not been setup yet!'
+      # PAPI: %player_name% for executor; %rel_example_relation% and
+      # {viewer:player_name} per viewer when Broadcast is enabled.
       Broadcast: false
 
     Example2:
@@ -33,6 +35,7 @@ General_Settings:
       # Enabled_Params: example@0
       Priority: 0
       Translate_Color_Codes: false
+      # PAPI placeholders in commands use the player who invoked the alias.
       Command: 'msg <sender_name> Hi, this is an example!'
       Executor: CONSOLE
       Grant_Permission: false

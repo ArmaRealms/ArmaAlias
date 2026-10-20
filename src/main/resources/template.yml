@@ -63,7 +63,13 @@ General_Settings:
       # Color codes have to start with '&'
       Translate_Color_Codes: false
 
-      # This is an action specific setting called 'Text'
+      # This message can contain normal PlaceholderAPI placeholders for the executor:
+      # %player_name% -> player who ran the alias (also when broadcasting).
+      # %rel_<expansion>_<key>% -> relationship between executor and each viewer.
+      # {viewer:player_name} -> normal PAPI placeholder resolved for each viewer.
+      # Relational/viewer tokens are resolved per recipient only for MESSAGE actions.
+      # Example: '&a%player_name% &7-> &f{viewer:player_name} &7(%rel_example_relation%)'
+      # This is an action specific setting called 'Message'
       # This text will be sent to the sender or broadcast when this action is executed
       Message: '&cThis alias has not been setup yet!'
 
@@ -105,6 +111,10 @@ General_Settings:
       Translate_Color_Codes: false
 
       # This is an action specific setting called 'Command'
+      # Normal PlaceholderAPI values such as %player_name% and %vault_prefix%
+      # use the player who triggered the alias (not the CONSOLE executor).
+      # PAPI is parsed before <params> so user-supplied arguments are not reparsed.
+      # Relational placeholders require a viewer and are only resolved in messages.
       # This is the command that is bound to this action
       # It isn't necessary to add a '/'
       Command: 'msg <sender_name> Hi, this is an example!'

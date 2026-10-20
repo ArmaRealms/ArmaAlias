@@ -30,7 +30,9 @@ public final class CommandAction extends Action {
 
     @Override
     public void execute(SimpleAlias plugin, CommandSender sender, String[] params) {
-        executor.dispatchCommand(plugin, sender, replaceVariables(command, plugin, sender, params), grantPermission, silent);
+        // Evaluate configured placeholders first so raw arguments never become new PAPI expressions.
+        String template = plugin.getPlaceholderHook().parseActor(sender, command);
+        executor.dispatchCommand(plugin, sender, replaceVariables(template, plugin, sender, params), grantPermission, silent);
     }
 
     public void setCommand(String command) {
