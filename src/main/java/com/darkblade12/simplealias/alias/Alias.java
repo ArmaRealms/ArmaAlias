@@ -19,7 +19,9 @@ import com.darkblade12.simplealias.plugin.settings.SettingInfo;
 import com.darkblade12.simplealias.replacer.Replacer;
 import com.darkblade12.simplealias.util.ConvertUtils;
 import com.darkblade12.simplealias.util.MessageUtils;
-import org.apache.commons.lang.StringUtils;
+import com.darkblade12.simplealias.util.TextFormat;
+import net.kyori.adventure.text.Component;
+import com.darkblade12.simplealias.util.ConvertUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -49,7 +51,6 @@ public final class Alias implements Nameable {
     public static final String DEFAULT_DESCRIPTION = "No description set";
     private final SimpleAlias plugin;
     private final ConfigurationReader<SimpleAlias> reader;
-    private AliasCommand command;
     private String name;
     private String description;
     private boolean executableAsConsole;
@@ -96,10 +97,6 @@ public final class Alias implements Nameable {
         }
         loadSettings();
 
-        command = new AliasCommand(this);
-        command.setPermissionMessage(permissionMessage);
-
-        registerCommand();
     }
 
     private Alias(SimpleAlias plugin, ConfigurationReader<SimpleAlias> reader) throws AliasException, InvalidValueException {
@@ -297,7 +294,6 @@ public final class Alias implements Nameable {
             }
 
             int priority = section.getInt(ActionSetting.PRIORITY.getPath());
-            boolean translateColorCodes = section.getBoolean(ActionSetting.TRANSLATE_COLOR_CODES.getPath());
 
             switch (type) {
                 case COMMAND:
@@ -307,7 +303,7 @@ public final class Alias implements Nameable {
                         throw new InvalidValueException(commandPath, "no value set");
                     }
 
-                    command = StringUtils.removeStart(command, "/");
+                    command = ConvertUtils.removeStart(command, "/");
                     if (command.split(" ")[0].equalsIgnoreCase(name)) {
                         throw new InvalidValueException(commandPath, command, "alias cannot execute itself");
                     }
@@ -327,13 +323,13 @@ public final class Alias implements Nameable {
                     boolean silent = section.getBoolean(ActionSetting.SILENT.getPath());
 
                     actions.add(new CommandAction(actionName, enabledWorlds, enabledPermissionNodes, enabledPermissionGroups, enabledParams,
-                                                  priority, translateColorCodes, command, executor, grantPermission, silent));
+                                                  priority, command, executor, grantPermission, silent));
                     break;
                 case MESSAGE:
                     List<String> lines = section.getStringList(ActionSetting.MESSAGE.getPath());
                     String message;
                     if (!lines.isEmpty()) {
-                        message = StringUtils.join(lines, "\n§r");
+                        message = ConvertUtils.join(lines, "\n");
                     } else {
                         message = section.getString(ActionSetting.MESSAGE.getPath());
                         if (MessageUtils.isBlank(message)) {
@@ -345,7 +341,7 @@ public final class Alias implements Nameable {
                     boolean broadcast = section.getBoolean(ActionSetting.BROADCAST.getPath());
 
                     actions.add(new MessageAction(actionName, enabledWorlds, enabledPermissionNodes, enabledPermissionGroups, enabledParams,
-                                                  priority, translateColorCodes, message, broadcast));
+                                                  priority, message, broadcast));
                     break;
             }
         }
@@ -356,17 +352,8 @@ public final class Alias implements Nameable {
     }
 
     public void reloadSettings() throws AliasException, InvalidValueException {
-        if (command.isRegistered()) {
-            unregisterCommand();
-        }
-
         loadSettings();
-
-        command.setDescription(description);
-        command.setUsage(usageCheckMessage);
-        command.setPermissionMessage(permissionMessage);
-
-        registerCommand();
+        plugin.refreshCommands();
     }
 
     public void saveSettings() throws AliasException {
@@ -406,7 +393,8 @@ public final class Alias implements Nameable {
                                                .collect(Collectors.toList());
             section.set(ActionSetting.ENABLED_PARAMS.getPath(), enabledParams);
             section.set(ActionSetting.PRIORITY.getPath(), action.getPriority());
-            section.set(ActionSetting.TRANSLATE_COLOR_CODES.getPath(), action.hasTranslateColorCodes());
+            // Remove the obsolete legacy-color field when resaving an existing alias.
+            section.set("Translate_Color_Codes", null);
 
             if (action instanceof CommandAction) {
                 CommandAction commandAction = (CommandAction) action;
@@ -459,26 +447,6 @@ public final class Alias implements Nameable {
         }
     }
 
-    public void registerCommand() throws AliasException {
-        try {
-            if (!command.register()) {
-                throw new AliasException(String.format("Failed to register alias '%s' as a command.", name));
-            }
-        } catch (IllegalStateException e) {
-            throw new AliasException(String.format("Alias '%s' is already registered as a command.", name));
-        }
-    }
-
-    public void unregisterCommand() throws AliasException {
-        try {
-            if (!command.unregister()) {
-                throw new AliasException(String.format("Failed to unregister alias '%s' from commands.", name));
-            }
-        } catch (IllegalStateException e) {
-            throw new AliasException(String.format("Alias '%s' is not registered as a command.", name));
-        }
-    }
-
     public boolean testPermission(CommandSender sender) {
         if (!permissionEnabled || sender instanceof ConsoleCommandSender) {
             return true;
@@ -494,7 +462,7 @@ public final class Alias implements Nameable {
     public void execute(final CommandSender sender, final String[] params) {
         if (sender instanceof ConsoleCommandSender && !executableAsConsole) {
             if (!MessageUtils.isBlank(consoleMessage)) {
-                sender.sendMessage(consoleMessage);
+                sender.sendMessage(TextFormat.render(consoleMessage));
             }
             return;
         }
@@ -502,22 +470,22 @@ public final class Alias implements Nameable {
         if (loggingEnabled && !MessageUtils.isBlank(loggingMessage)) {
             Replacer replacer = Replacer.builder()
                                         .with(DynamicVariable.ALIAS_NAME, name)
-                                        .with(DynamicVariable.PARAMS, StringUtils.join(params, " "))
+                                        .with(DynamicVariable.PARAMS, ConvertUtils.join(params, " "))
                                         .with(DynamicVariable.SENDER_NAME, sender.getName())
                                         .build();
-            Bukkit.getLogger().info(replacer.replaceAll(loggingMessage));
+            plugin.getLogger().info(replacer.replaceAll(loggingMessage));
         }
 
         if (!testPermission(sender)) {
             if (!MessageUtils.isBlank(permissionMessage)) {
-                sender.sendMessage(permissionMessage);
+                sender.sendMessage(TextFormat.render(permissionMessage));
             }
             return;
         }
 
         if (usageCheckEnabled && (params.length < usageCheckMinParams || usageCheckMaxParams >= 0 && params.length > usageCheckMaxParams)) {
             if (!MessageUtils.isBlank(usageCheckMessage)) {
-                sender.sendMessage(usageCheckMessage);
+                sender.sendMessage(TextFormat.render(usageCheckMessage));
             }
             return;
         }
@@ -530,7 +498,7 @@ public final class Alias implements Nameable {
         final Player player = (Player) sender;
         if (!isEnabled(player.getWorld()) && !Permission.BYPASS_ENABLED_WORLDS.test(player)) {
             if (!MessageUtils.isBlank(worldMessage)) {
-                player.sendMessage(worldMessage);
+                player.sendMessage(TextFormat.render(worldMessage));
             }
             return;
         }
@@ -541,7 +509,9 @@ public final class Alias implements Nameable {
         if (cooldown != null) {
             if (!cooldown.isExpired()) {
                 if (cooldownMessage != null && !cooldownMessage.isEmpty()) {
-                    player.sendMessage(cooldownMessage.replace("<remaining_time>", cooldown.toString()));
+                    player.sendMessage(TextFormat.render(
+                            cooldownMessage.replace("<remaining_time>", "<armavalue0>"),
+                            Map.of("armavalue0", Component.text(cooldown.toString()))));
                 }
                 return;
             }
@@ -552,11 +522,11 @@ public final class Alias implements Nameable {
         VaultHook vault = plugin.getVaultHook();
         if (costEnabled && !Permission.BYPASS_COST.test(sender) && !vault.withdrawPlayer(player, costAmount)) {
             if (!MessageUtils.isBlank(costMessage)) {
-                Replacer replacer = Replacer.builder()
-                                            .with(DynamicVariable.COST_AMOUNT, vault.formatCurrency(costAmount))
-                                            .with(DynamicVariable.MONEY_BALANCE, vault.formatCurrency(vault.getBalance(player)))
-                                            .build();
-                player.sendMessage(replacer.replaceAll(costMessage));
+                player.sendMessage(TextFormat.render(
+                            costMessage.replace("<cost_amount>", "<armavalue0>")
+                                    .replace("<money_balance>", "<armavalue1>"),
+                            Map.of("armavalue0", TextFormat.external(vault.formatCurrency(costAmount)),
+                                    "armavalue1", TextFormat.external(vault.formatCurrency(vault.getBalance(player))))));
             }
             return;
         }
@@ -582,7 +552,9 @@ public final class Alias implements Nameable {
 
         String remainingTime = MessageUtils.formatDuration(delayDuration * 1000);
         if (!MessageUtils.isBlank(delayMessage)) {
-            sender.sendMessage(DynamicVariable.REMAINING_TIME.replaceAll(delayMessage, remainingTime));
+            sender.sendMessage(TextFormat.render(
+                    delayMessage.replace("<remaining_time>", "<armavalue0>"),
+                    Map.of("armavalue0", Component.text(remainingTime))));
         }
 
         new BukkitRunnable() {
@@ -611,7 +583,7 @@ public final class Alias implements Nameable {
                         execution.cancel();
 
                         if (delayCancelMessage != null && !delayCancelMessage.isEmpty()) {
-                            player.sendMessage(delayCancelMessage);
+                            player.sendMessage(TextFormat.render(delayCancelMessage));
                         }
                     }
                 }
@@ -646,21 +618,8 @@ public final class Alias implements Nameable {
             throw new AliasException(String.format("Failed to rename alias configuration to '%s'.", fileName));
         }
 
-        unregisterCommand();
-        command.setName(name);
-        try {
-            registerCommand();
-        } catch (AliasException e) {
-            command.setName(this.name);
-            registerCommand();
-            throw e;
-        }
-
         this.name = name;
-
-        if (plugin.getSettings().hasCommandSync()) {
-            AliasCommand.syncCommands();
-        }
+        plugin.refreshCommands();
     }
 
     public void renameAction(Action action, String newName) {
@@ -678,7 +637,6 @@ public final class Alias implements Nameable {
 
     public void setDescription(String description) {
         this.description = description;
-        command.setDescription(description);
     }
 
     public void setExecutableAsConsole(boolean executableAsConsole) {
@@ -759,7 +717,6 @@ public final class Alias implements Nameable {
 
     public void setUsageCheckMessage(String usageCheckMessage) {
         this.usageCheckMessage = usageCheckMessage;
-        command.setUsage(usageCheckMessage);
     }
 
     public void setPermissionEnabled(boolean permissionEnabled) {
@@ -776,7 +733,6 @@ public final class Alias implements Nameable {
 
     public void setPermissionMessage(String permissionMessage) {
         this.permissionMessage = permissionMessage;
-        command.setPermissionMessage(permissionMessage);
     }
 
     public void setDelayEnabled(boolean delayEnabled) {
@@ -964,7 +920,4 @@ public final class Alias implements Nameable {
         return loggingMessage;
     }
 
-    public AliasCommand getCommand() {
-        return command;
-    }
 }

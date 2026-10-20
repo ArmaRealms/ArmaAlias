@@ -9,7 +9,7 @@ import com.darkblade12.simplealias.alias.action.CommandAction;
 import com.darkblade12.simplealias.alias.action.MessageAction;
 import com.darkblade12.simplealias.plugin.command.CommandBase;
 import com.darkblade12.simplealias.util.MessageUtils;
-import org.apache.commons.lang.StringUtils;
+import com.darkblade12.simplealias.util.ConvertUtils;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -26,7 +26,7 @@ public final class CreateActionCommand extends CommandBase<SimpleAlias> {
 
     @Override
     public void execute(SimpleAlias plugin, CommandSender sender, String label, String[] args) {
-        String name = StringUtils.removeStart(args[0], "/");
+        String name = ConvertUtils.removeStart(args[0], "/");
         Alias alias = plugin.getAliasManager().getAlias(name);
         if (alias == null) {
             plugin.sendMessage(sender, "alias.notFound", name);
@@ -47,13 +47,13 @@ public final class CreateActionCommand extends CommandBase<SimpleAlias> {
             return;
         }
 
-        String value = args.length < 4 ? null : StringUtils.join(args, ' ', 3, args.length);
+        String value = args.length < 4 ? null : ConvertUtils.join(args, ' ', 3, args.length);
 
         switch (type) {
             case COMMAND:
                 String command;
                 if (value != null) {
-                    command = StringUtils.removeStart(value, "/");
+                    command = ConvertUtils.removeStart(value, "/");
                     if (MessageUtils.isBlank(command)) {
                         plugin.sendMessage(sender, "command.alias.createaction.noEmptyValue");
                         return;

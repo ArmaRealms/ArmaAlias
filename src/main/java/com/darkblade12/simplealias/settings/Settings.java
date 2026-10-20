@@ -6,7 +6,7 @@ import com.darkblade12.simplealias.alias.action.ActionSetting;
 import com.darkblade12.simplealias.plugin.settings.InvalidValueException;
 import com.darkblade12.simplealias.plugin.settings.SettingsBase;
 import com.darkblade12.simplealias.util.MessageUtils;
-import org.apache.commons.lang.StringUtils;
+import com.darkblade12.simplealias.util.ConvertUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -43,7 +43,7 @@ public final class Settings extends SettingsBase<SimpleAlias> {
         ConfigurationSection commandSection = config.getConfigurationSection(Section.DISABLED_COMMANDS.getPath());
         if (commandSection != null) {
             for (String command : commandSection.getKeys(false)) {
-                String commandName = StringUtils.removeStart(command.toLowerCase(), "/");
+                String commandName = ConvertUtils.removeStart(command.toLowerCase(), "/");
                 if (disabledCommands.containsKey(commandName)) {
                     plugin.logInfo("Skipping disabled command {0}: multiple entries for the same command", commandName);
                     continue;

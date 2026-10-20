@@ -3,11 +3,9 @@ package com.darkblade12.simplealias.alias.action;
 import com.darkblade12.simplealias.SimpleAlias;
 import com.darkblade12.simplealias.alias.DynamicVariable;
 import com.darkblade12.simplealias.nameable.Nameable;
-import com.darkblade12.simplealias.plugin.hook.FactionsHook;
 import com.darkblade12.simplealias.plugin.hook.VaultHook;
 import com.darkblade12.simplealias.replacer.Replacer;
-import com.darkblade12.simplealias.util.MessageUtils;
-import org.apache.commons.lang.StringUtils;
+import com.darkblade12.simplealias.util.ConvertUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -24,26 +22,20 @@ public abstract class Action implements Nameable, Comparable<Action> {
     protected Set<String> enabledPermissionGroups;
     protected Map<Integer, String> enabledParams;
     protected int priority;
-    protected boolean translateColorCodes;
 
     protected Action(String name, Set<String> enabledWorlds, Set<String> enabledPermissionNodes, Set<String> enabledPermissionGroups,
-                     Map<Integer, String> enabledParams, int priority, boolean translateColorCodes) {
+                     Map<Integer, String> enabledParams, int priority) {
         this.name = name;
         this.enabledWorlds = enabledWorlds;
         this.enabledPermissionNodes = enabledPermissionNodes;
         this.enabledPermissionGroups = enabledPermissionGroups;
         this.enabledParams = enabledParams;
         this.priority = priority;
-        this.translateColorCodes = translateColorCodes;
     }
 
     public abstract void execute(SimpleAlias plugin, CommandSender sender, String[] params);
 
     protected String replaceVariables(String target, SimpleAlias plugin, CommandSender sender, String[] params) {
-        if (translateColorCodes) {
-            params = MessageUtils.translateArguments(params);
-        }
-
         Replacer.ReplacerBuilder builder = Replacer.builder().with(DynamicVariable.SENDER_NAME, sender.getName());
 
         if (sender instanceof Player) {
@@ -61,14 +53,10 @@ public abstract class Action implements Nameable, Comparable<Action> {
                 }
             }
 
-            FactionsHook factions = plugin.getFactionsHook();
-            if (factions.isEnabled()) {
-                builder.with(DynamicVariable.FACTION_NAME, factions.getFaction(player));
-            }
         }
 
         if (params.length > 0) {
-            builder.with(DynamicVariable.PARAMS, StringUtils.join(params, " "));
+            builder.with(DynamicVariable.PARAMS, ConvertUtils.join(params, " "));
 
             Matcher matcher = DynamicVariable.PARAMS_INDEX.getPattern().matcher(target);
             while (matcher.find()) {
@@ -95,7 +83,7 @@ public abstract class Action implements Nameable, Comparable<Action> {
                     builder.with(variable, params[rangeStart]);
                 } else if (rangeStart < rangeEnd) {
                     String[] includedParams = Arrays.copyOfRange(params, rangeStart, Math.min(rangeEnd, params.length) + 1);
-                    builder.with(variable, StringUtils.join(includedParams, " "));
+                    builder.with(variable, ConvertUtils.join(includedParams, " "));
                 }
             }
         }
@@ -131,10 +119,6 @@ public abstract class Action implements Nameable, Comparable<Action> {
 
     public void setPriority(int priority) {
         this.priority = priority;
-    }
-
-    public void setTranslateColorCodes(boolean translateColorCodes) {
-        this.translateColorCodes = translateColorCodes;
     }
 
     @Override
@@ -189,10 +173,6 @@ public abstract class Action implements Nameable, Comparable<Action> {
 
     public int getPriority() {
         return priority;
-    }
-
-    public boolean hasTranslateColorCodes() {
-        return translateColorCodes;
     }
 
     public abstract ActionType getType();

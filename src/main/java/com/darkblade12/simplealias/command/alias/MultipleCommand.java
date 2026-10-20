@@ -9,7 +9,7 @@ import com.darkblade12.simplealias.alias.action.Action;
 import com.darkblade12.simplealias.alias.action.CommandAction;
 import com.darkblade12.simplealias.plugin.command.CommandBase;
 import com.darkblade12.simplealias.plugin.settings.InvalidValueException;
-import org.apache.commons.lang.StringUtils;
+import com.darkblade12.simplealias.util.ConvertUtils;
 import org.bukkit.command.CommandSender;
 
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ public final class MultipleCommand extends CommandBase<SimpleAlias> {
 
     @Override
     public void execute(SimpleAlias plugin, CommandSender sender, String label, String[] args) {
-        String name = StringUtils.removeStart(args[0], "/");
+        String name = ConvertUtils.removeStart(args[0], "/");
         AliasManager manager = plugin.getAliasManager();
         if (manager.hasAlias(name)) {
             plugin.sendMessage(sender, "alias.alreadyExists", name);
@@ -34,12 +34,12 @@ public final class MultipleCommand extends CommandBase<SimpleAlias> {
         }
 
         String[] commandParts = Arrays.copyOfRange(args, 1, args.length);
-        String[] commands = StringUtils.join(commandParts, ' ').split("#");
+        String[] commands = ConvertUtils.join(commandParts, ' ').split("#");
         List<Action> actions = new ArrayList<>();
         List<String> executionOrder = new ArrayList<>();
 
         for (int i = 0; i < commands.length; i++) {
-            String finalCommand = StringUtils.removeStart(commands[i], "/");
+            String finalCommand = ConvertUtils.removeStart(commands[i], "/");
             if (finalCommand.split(" ")[0].equalsIgnoreCase(name)) {
                 plugin.sendMessage(sender, "alias.noSelfExecution");
                 return;

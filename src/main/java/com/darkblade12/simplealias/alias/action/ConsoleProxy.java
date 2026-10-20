@@ -12,6 +12,8 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Set;
+import java.util.UUID;
+import net.kyori.adventure.text.Component;
 
 final class ConsoleProxy implements ConsoleCommandSender {
     private final CommandSender source;
@@ -36,6 +38,28 @@ final class ConsoleProxy implements ConsoleCommandSender {
         if (!silent) {
             source.sendMessage(messages);
         }
+    }
+
+    @Override
+    public void sendMessage(UUID sender, String message) {
+        sendMessage(message);
+    }
+
+    @Override
+    public void sendMessage(UUID sender, String... messages) {
+        sendMessage(messages);
+    }
+
+    @Override
+    public void sendMessage(Component message) {
+        if (!silent) {
+            source.sendMessage(message);
+        }
+    }
+
+    @Override
+    public Component name() {
+        return source.name();
     }
 
     @Override
@@ -147,6 +171,11 @@ final class ConsoleProxy implements ConsoleCommandSender {
         if (source instanceof Conversable) {
             ((Conversable) source).abandonConversation(conversation, details);
         }
+    }
+
+    @Override
+    public void sendRawMessage(UUID sender, String message) {
+        sendRawMessage(message);
     }
 
     @Override

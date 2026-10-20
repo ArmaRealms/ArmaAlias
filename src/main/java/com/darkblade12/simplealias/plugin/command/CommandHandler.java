@@ -1,22 +1,25 @@
 package com.darkblade12.simplealias.plugin.command;
 
 import com.darkblade12.simplealias.plugin.PluginBase;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
+import io.papermc.paper.command.brigadier.BasicCommand;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public abstract class CommandHandler<T extends PluginBase> implements CommandExecutor, TabCompleter, Iterable<CommandBase<T>> {
+/**
+ * Dispatches existing administrative subcommands through a Paper Brigadier root command.
+ */
+public abstract class CommandHandler<T extends PluginBase> implements BasicCommand, Iterable<CommandBase<T>> {
     protected final T plugin;
     protected final String defaultLabel;
     protected final Map<String, CommandBase<T>> commands;
@@ -36,81 +39,70 @@ public abstract class CommandHandler<T extends PluginBase> implements CommandExe
     public void enable() throws CommandRegistrationException {
         registerCommand(help);
         registerCommands();
-        registerExecutor();
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command bukkitCommand, String label, String[] args) {
+    public void execute(CommandSourceStack source, String[] args) {
+        CommandSender sender = source.getSender();
         if (args.length == 0) {
-            displayUnknownCommand(sender, label);
-            return true;
+            displayUnknownCommand(sender, defaultLabel);
+            return;
         }
 
         CommandBase<T> command = getCommand(args[0]);
         if (command == null) {
-            displayUnknownCommand(sender, label);
-            return true;
+            displayUnknownCommand(sender, defaultLabel);
+            return;
         }
 
         String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
         if (!command.isExecutableAsConsole() && !(sender instanceof Player)) {
             plugin.sendMessage(sender, "command.noConsole");
-            return true;
+            return;
         }
 
         if (!command.testPermission(sender)) {
             plugin.sendMessage(sender, "command.noPermission");
-            return true;
+            return;
         }
 
         if (!command.isValid(subArgs)) {
-            displayInvalidUsage(sender, command, label);
-            return true;
+            displayInvalidUsage(sender, command, defaultLabel);
+            return;
         }
 
-        command.execute(plugin, sender, label, subArgs);
-        return true;
+        command.execute(plugin, sender, defaultLabel, subArgs);
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender, Command bukkitCommand, String alias, String[] args) {
+    public Collection<String> suggest(CommandSourceStack source, String[] args) {
+        CommandSender sender = source.getSender();
         if (args.length < 1) {
             return Collections.emptyList();
         }
 
         List<String> suggestions;
         if (args.length == 1) {
-            suggestions = commands.values().stream().filter(c -> c.testPermission(sender)).map(CommandBase::getName)
-                                  .collect(Collectors.toList());
+            suggestions = commands.values().stream()
+                    .filter(c -> c.testPermission(sender) && (c.isExecutableAsConsole() || sender instanceof Player))
+                    .map(CommandBase::getName)
+                    .collect(Collectors.toList());
         } else {
             CommandBase<T> command = getCommand(args[0]);
-            if (command == null) {
-                return null;
+            if (command == null || !command.testPermission(sender)) {
+                return Collections.emptyList();
             }
 
-            String[] subArgs = Arrays.copyOfRange(args, 1, args.length);
-            suggestions = command.getSuggestions(plugin, sender, subArgs);
+            suggestions = command.getSuggestions(plugin, sender, Arrays.copyOfRange(args, 1, args.length));
         }
 
         if (suggestions == null || suggestions.isEmpty()) {
             return Collections.emptyList();
         }
 
-        String filter = args[args.length - 1].toLowerCase();
-        if (filter.isEmpty()) {
-            return suggestions;
-        }
-
-        return suggestions.stream().filter(arg -> arg.toLowerCase().startsWith(filter)).collect(Collectors.toList());
-    }
-
-    private void registerExecutor() throws CommandRegistrationException {
-        PluginCommand command = plugin.getCommand(defaultLabel);
-        if (command == null) {
-            throw new CommandRegistrationException("The command '%s' is not registered in the plugin.yml.", defaultLabel);
-        }
-
-        command.setExecutor(this);
+        String filter = args[args.length - 1].toLowerCase(Locale.ROOT);
+        return suggestions.stream().filter(s -> s.toLowerCase(Locale.ROOT).startsWith(filter))
+                .collect(Collectors.toList());
     }
 
     protected void registerCommand(CommandBase<T> command) throws CommandRegistrationException {
@@ -118,7 +110,6 @@ public abstract class CommandHandler<T extends PluginBase> implements CommandExe
         if (commands.containsKey(name)) {
             throw new CommandRegistrationException("The command '%s' cannot be registered multiple times.", name);
         }
-
         commands.put(name, command);
     }
 
@@ -129,7 +120,6 @@ public abstract class CommandHandler<T extends PluginBase> implements CommandExe
         } catch (Exception e) {
             throw new CommandRegistrationException("Failed to instantiate the command of class '%s'.", cmdClass.getName(), e);
         }
-
         registerCommand(command);
     }
 
@@ -157,6 +147,6 @@ public abstract class CommandHandler<T extends PluginBase> implements CommandExe
     }
 
     public CommandBase<T> getCommand(String name) {
-        return commands.getOrDefault(name.toLowerCase(), null);
+        return commands.get(name.toLowerCase(Locale.ROOT));
     }
 }

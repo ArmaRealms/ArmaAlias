@@ -16,7 +16,7 @@ import com.darkblade12.simplealias.plugin.command.CommandBase;
 import com.darkblade12.simplealias.plugin.hook.VaultHook;
 import com.darkblade12.simplealias.util.ConvertUtils;
 import com.darkblade12.simplealias.util.MessageUtils;
-import org.apache.commons.lang.StringUtils;
+import com.darkblade12.simplealias.util.ConvertUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
@@ -37,7 +37,7 @@ public final class ModifyActionCommand extends CommandBase<SimpleAlias> {
 
     @Override
     public void execute(SimpleAlias plugin, CommandSender sender, String label, String[] args) {
-        String name = StringUtils.removeStart(args[0], "/");
+        String name = ConvertUtils.removeStart(args[0], "/");
         Alias alias = plugin.getAliasManager().getAlias(name);
         if (alias == null) {
             plugin.sendMessage(sender, "alias.notFound", name);
@@ -71,7 +71,7 @@ public final class ModifyActionCommand extends CommandBase<SimpleAlias> {
             return;
         }
 
-        String value = StringUtils.join(args, ' ', 4, args.length);
+        String value = ConvertUtils.join(args, ' ', 4, args.length);
         boolean add = operation == ModifyOperation.ADD;
         boolean empty = ConvertUtils.isEmpty(value);
         if (empty) {
@@ -100,7 +100,7 @@ public final class ModifyActionCommand extends CommandBase<SimpleAlias> {
                             newValues++;
                         }
                     }
-                    value = StringUtils.join(enabledWorlds, ", ");
+                    value = ConvertUtils.join(enabledWorlds, ", ");
 
                     if (add && newValues == 0) {
                         plugin.sendMessage(sender, "value.noNewValues", value, settingName);
@@ -120,7 +120,7 @@ public final class ModifyActionCommand extends CommandBase<SimpleAlias> {
                             newValues++;
                         }
                     }
-                    value = StringUtils.join(enabledPermissionNodes, ", ");
+                    value = ConvertUtils.join(enabledPermissionNodes, ", ");
 
                     if (add && newValues == 0) {
                         plugin.sendMessage(sender, "value.noNewValues", value, settingName);
@@ -149,7 +149,7 @@ public final class ModifyActionCommand extends CommandBase<SimpleAlias> {
                             newValues++;
                         }
                     }
-                    value = StringUtils.join(enabledPermissionGroups, ", ");
+                    value = ConvertUtils.join(enabledPermissionGroups, ", ");
 
                     if (add && newValues == 0) {
                         plugin.sendMessage(sender, "value.noNewValues", value, settingName);
@@ -212,25 +212,13 @@ public final class ModifyActionCommand extends CommandBase<SimpleAlias> {
 
                 action.setPriority(priority);
                 break;
-            case TRANSLATE_COLOR_CODES:
-                boolean translateColorCodes;
-                try {
-                    translateColorCodes = ConvertUtils.convertToBoolean(value);
-                } catch (Exception e) {
-                    plugin.sendMessage(sender, "value.noBoolean", value);
-                    return;
-                }
-
-                value = String.valueOf(translateColorCodes);
-                action.setTranslateColorCodes(translateColorCodes);
-                break;
             case COMMAND:
                 if (action.getType() != ActionType.COMMAND) {
                     plugin.sendMessage(sender, "command.alias.modifyaction.onlyCommand", settingName);
                     return;
                 }
 
-                value = StringUtils.removeStart(value, "/");
+                value = ConvertUtils.removeStart(value, "/");
                 if (value.isEmpty()) {
                     plugin.sendMessage(sender, "value.noEmpty", settingName);
                     return;
@@ -369,7 +357,6 @@ public final class ModifyActionCommand extends CommandBase<SimpleAlias> {
                             return Bukkit.getWorlds().stream().map(World::getName).collect(Collectors.toList());
                         case ENABLED_PERMISSION_GROUPS:
                             return Arrays.asList(plugin.getVaultHook().getGroups());
-                        case TRANSLATE_COLOR_CODES:
                         case GRANT_PERMISSION:
                         case BROADCAST:
                             return args.length > 5 ? null : Arrays.asList("true", "false");

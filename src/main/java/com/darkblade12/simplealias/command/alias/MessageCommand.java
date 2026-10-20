@@ -8,9 +8,8 @@ import com.darkblade12.simplealias.alias.AliasManager;
 import com.darkblade12.simplealias.alias.action.MessageAction;
 import com.darkblade12.simplealias.plugin.command.CommandBase;
 import com.darkblade12.simplealias.plugin.settings.InvalidValueException;
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
-import org.bukkit.ChatColor;
+import com.darkblade12.simplealias.util.JavaEscapes;
+import com.darkblade12.simplealias.util.ConvertUtils;
 import org.bukkit.command.CommandSender;
 
 import java.util.Arrays;
@@ -22,7 +21,7 @@ public final class MessageCommand extends CommandBase<SimpleAlias> {
 
     @Override
     public void execute(SimpleAlias plugin, CommandSender sender, String label, String[] args) {
-        String name = StringUtils.removeStart(args[0], "/");
+        String name = ConvertUtils.removeStart(args[0], "/");
         AliasManager manager = plugin.getAliasManager();
         if (manager.hasAlias(name)) {
             plugin.sendMessage(sender, "alias.alreadyExists", name);
@@ -42,7 +41,7 @@ public final class MessageCommand extends CommandBase<SimpleAlias> {
         }
 
         String[] messageParts = Arrays.copyOfRange(args, 1, args.length);
-        String message = ChatColor.translateAlternateColorCodes('&', StringEscapeUtils.unescapeJava(StringUtils.join(messageParts, ' ')));
+        String message = JavaEscapes.unescapeJava(ConvertUtils.join(messageParts, ' '));
 
         MessageAction action = new MessageAction("DisplayMessage", message);
         alias.setActions(action);

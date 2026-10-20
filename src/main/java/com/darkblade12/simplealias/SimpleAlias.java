@@ -3,40 +3,45 @@ package com.darkblade12.simplealias;
 import com.darkblade12.simplealias.alias.Alias;
 import com.darkblade12.simplealias.alias.AliasException;
 import com.darkblade12.simplealias.alias.AliasManager;
+import com.darkblade12.simplealias.alias.AliasCommand;
 import com.darkblade12.simplealias.alias.AliasConverter;
 import com.darkblade12.simplealias.command.AliasCommandHandler;
 import com.darkblade12.simplealias.cooldown.CooldownManager;
 import com.darkblade12.simplealias.plugin.PluginBase;
 import com.darkblade12.simplealias.plugin.command.CommandRegistrationException;
-import com.darkblade12.simplealias.plugin.hook.FactionsHook;
 import com.darkblade12.simplealias.plugin.hook.VaultHook;
+import com.darkblade12.simplealias.plugin.hook.PlaceholderHook;
 import com.darkblade12.simplealias.plugin.reader.ConfigurationReader;
 import com.darkblade12.simplealias.plugin.settings.InvalidValueException;
 import com.darkblade12.simplealias.settings.Settings;
+import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import org.bukkit.Bukkit;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class SimpleAlias extends PluginBase {
-    public static final String PREFIX = "§8§l[§a§oSimple§7§oAlias§8§l]§r";
+    public static final String PREFIX = "<dark_gray><bold>[<green><italic>Simple<gray><italic>Alias<dark_gray><bold>]<reset>";
     private final Settings settings;
     private final VaultHook vaultHook;
-    private final FactionsHook factionsHook;
+    private final PlaceholderHook placeholderHook;
     private final CooldownManager cooldownManager;
     private final AliasManager aliasManager;
     private final AliasCommandHandler commandHandler;
     private final AliasConverter aliasConverter;
     private ConfigurationReader<SimpleAlias> templateReader;
     private boolean templateValid;
+    private boolean commandRefreshScheduled;
 
     public SimpleAlias() {
-        super(47360, 8539);
         settings = new Settings(this);
         vaultHook = new VaultHook();
-        factionsHook = new FactionsHook();
+        placeholderHook = new PlaceholderHook();
         cooldownManager = new CooldownManager(this);
         aliasManager = new AliasManager(this);
         commandHandler = new AliasCommandHandler(this);
@@ -62,8 +67,8 @@ public final class SimpleAlias extends PluginBase {
             logInfo("Vault detected and hooked. ({0})",
                     services.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.joining(" and ")));
         }
-        if (factionsHook.enable()) {
-            logInfo("Factions detected and hooked.");
+        if (placeholderHook.enable()) {
+            logInfo("PlaceholderAPI detected and hooked.");
         }
 
         try {
@@ -81,11 +86,44 @@ public final class SimpleAlias extends PluginBase {
             return false;
         }
 
+        getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> registerBrigadierCommands(event.registrar()));
         return true;
+    }
+
+    /** Called for each Paper command-tree rebuild, including Minecraft data reloads. */
+    private void registerBrigadierCommands(Commands registrar) {
+        registrar.register("alias", "Manage configured aliases", List.of("simplealias", "salias", "sa"), commandHandler);
+
+        for (Alias alias : aliasManager.getAliases()) {
+            String name = alias.getName();
+            // Paper's registrar overrides existing root commands. Never steal another plugin's command.
+            if (registrar.getDispatcher().getRoot().getChild(name) != null) {
+                logWarning("Skipped alias {0}: another Brigadier command uses that name.", name);
+                continue;
+            }
+            registrar.register(name, alias.getDescription(), new AliasCommand(this, name));
+        }
+    }
+
+    /** Schedule at most one data reload for command name changes in the same tick. */
+    public void refreshCommands() {
+        if (!isEnabled() || !settings.hasCommandSync() || commandRefreshScheduled) {
+            return;
+        }
+        commandRefreshScheduled = true;
+        Bukkit.getScheduler().runTask(this, () -> {
+            commandRefreshScheduled = false;
+            try {
+                Bukkit.reloadData();
+            } catch (Exception e) {
+                logException("Failed to reload Brigadier command data: {0}", e);
+            }
+        });
     }
 
     @Override
     public void disable() {
+        commandRefreshScheduled = false;
         cooldownManager.disable();
         aliasManager.disable();
     }
@@ -102,7 +140,7 @@ public final class SimpleAlias extends PluginBase {
         initializeTemplate();
 
         vaultHook.enable();
-        factionsHook.enable();
+        placeholderHook.enable();
 
         convertAliases();
 
@@ -176,8 +214,8 @@ public final class SimpleAlias extends PluginBase {
         return vaultHook;
     }
 
-    public FactionsHook getFactionsHook() {
-        return factionsHook;
+    public PlaceholderHook getPlaceholderHook() {
+        return placeholderHook;
     }
 
     public CooldownManager getCooldownManager() {

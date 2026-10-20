@@ -7,7 +7,7 @@ import com.darkblade12.simplealias.alias.AliasException;
 import com.darkblade12.simplealias.alias.AliasManager;
 import com.darkblade12.simplealias.plugin.command.CommandBase;
 import com.darkblade12.simplealias.plugin.settings.InvalidValueException;
-import org.apache.commons.lang.StringUtils;
+import com.darkblade12.simplealias.util.ConvertUtils;
 import org.bukkit.command.CommandSender;
 
 public final class CreateCommand extends CommandBase<SimpleAlias> {
@@ -17,7 +17,7 @@ public final class CreateCommand extends CommandBase<SimpleAlias> {
 
     @Override
     public void execute(SimpleAlias plugin, CommandSender sender, String label, String[] args) {
-        String name = StringUtils.removeStart(args[0], "/");
+        String name = ConvertUtils.removeStart(args[0], "/");
         AliasManager manager = plugin.getAliasManager();
         if (manager.hasAlias(name)) {
             plugin.sendMessage(sender, "alias.alreadyExists", name);

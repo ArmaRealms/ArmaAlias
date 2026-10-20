@@ -8,7 +8,7 @@ import com.darkblade12.simplealias.plugin.reader.ConfigurationReader;
 import com.darkblade12.simplealias.plugin.settings.InvalidValueException;
 import com.darkblade12.simplealias.settings.Settings;
 import com.darkblade12.simplealias.util.MessageUtils;
-import org.apache.commons.lang.StringUtils;
+import com.darkblade12.simplealias.util.ConvertUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -26,7 +26,7 @@ public final class AliasManager extends Manager<SimpleAlias> {
     private final Set<UUID> uncheckedPlayers;
 
     public AliasManager(SimpleAlias plugin) {
-        super(plugin, new File("plugins/SimpleAlias/aliases/"));
+        super(plugin, new File(plugin.getDataFolder(), "aliases"));
         aliases = new NameableList<>();
         uncheckedPlayers = new HashSet<>();
     }
@@ -41,7 +41,6 @@ public final class AliasManager extends Manager<SimpleAlias> {
 
     @Override
     protected void onDisable() {
-        unloadAliases();
         aliases.clear();
         uncheckedPlayers.clear();
     }
@@ -67,15 +66,10 @@ public final class AliasManager extends Manager<SimpleAlias> {
         }
     }
 
-    private void unloadAliases() {
-        for (int i = 0; i < aliases.size(); i++) {
-            Alias alias = aliases.get(i);
-            try {
-                alias.unregisterCommand();
-            } catch (AliasException e) {
-                plugin.logException("{0}", e);
-            }
-        }
+    @Override
+    protected void onReload() {
+        super.onReload();
+        plugin.refreshCommands();
     }
 
     public Alias createAlias(String name) throws AliasException, InvalidValueException {
@@ -84,22 +78,15 @@ public final class AliasManager extends Manager<SimpleAlias> {
         }
 
         Alias alias = new Alias(plugin, name, true);
-        if (plugin.getSettings().hasCommandSync()) {
-            AliasCommand.syncCommands();
-        }
-
         aliases.add(alias);
+        plugin.refreshCommands();
         return alias;
     }
 
     public void removeAlias(Alias alias) throws AliasException {
-        alias.unregisterCommand();
         alias.deleteSettings();
-
-        if (plugin.getSettings().hasCommandSync()) {
-            AliasCommand.syncCommands();
-        }
         aliases.remove(alias.getName());
+        plugin.refreshCommands();
     }
 
     public void addUncheckedPlayer(Player player) {
@@ -108,7 +95,7 @@ public final class AliasManager extends Manager<SimpleAlias> {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onPlayerCommand(PlayerCommandPreprocessEvent event) {
-        String[] commandParts = StringUtils.removeStart(event.getMessage(), "/").split(" ");
+        String[] commandParts = ConvertUtils.removeStart(event.getMessage(), "/").split(" ");
         String command = commandParts[0].toLowerCase();
         Player player = event.getPlayer();
         UUID id = player.getUniqueId();

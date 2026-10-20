@@ -17,7 +17,6 @@ public final class DynamicVariable {
     public static Placeholder<String> WORLD_NAME = new Placeholder<>("<world_name>", Pattern.CASE_INSENSITIVE);
     public static Placeholder<String> MONEY_BALANCE = new Placeholder<>("<money_balance>", Pattern.CASE_INSENSITIVE);
     public static Placeholder<String> GROUP_NAME = new Placeholder<>("<group_name>", Pattern.CASE_INSENSITIVE);
-    public static Placeholder<String> FACTION_NAME = new Placeholder<>("<faction_name>", Pattern.CASE_INSENSITIVE);
 
     public static Placeholder<String> ALIAS_NAME = new Placeholder<>("<alias_name>", Pattern.CASE_INSENSITIVE);
     public static Placeholder<Integer> PARAM_COUNT = new Placeholder<>("<param_count>", Pattern.CASE_INSENSITIVE);
@@ -29,7 +28,7 @@ public final class DynamicVariable {
 
     public static List<Placeholder<?>> all() {
         return Arrays.asList(SENDER_NAME, SENDER_UUID, PARAMS, PARAMS_INDEX, PARAM_COUNT, WORLD_NAME, MONEY_BALANCE, GROUP_NAME,
-                             FACTION_NAME, ALIAS_NAME, REMAINING_TIME, COST_AMOUNT);
+                             ALIAS_NAME, REMAINING_TIME, COST_AMOUNT);
     }
 
     public static Replacement<String> createEmptyReplacement() {

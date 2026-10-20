@@ -5,8 +5,10 @@ import com.darkblade12.simplealias.SimpleAlias;
 import com.darkblade12.simplealias.alias.Alias;
 import com.darkblade12.simplealias.alias.AliasManager;
 import com.darkblade12.simplealias.plugin.command.CommandBase;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import com.darkblade12.simplealias.util.MessageUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 public final class ListCommand extends CommandBase<SimpleAlias> {
@@ -22,13 +24,15 @@ public final class ListCommand extends CommandBase<SimpleAlias> {
             return;
         }
 
-        StringBuilder list = new StringBuilder();
+        Component list = Component.empty();
         for (Alias alias : manager.getAliases()) {
-            ChatColor color1 = MessageUtils.randomColor();
-            ChatColor color2 = MessageUtils.similarColor(color1);
-            list.append('\n').append(plugin.formatMessage("command.alias.list.line", color1, alias.getName(), color2));
+            NamedTextColor first = MessageUtils.randomColor();
+            NamedTextColor second = MessageUtils.similarColor(first);
+            list = list.append(Component.newline())
+                    .append(Component.text(" ▪ ", first))
+                    .append(Component.text(alias.getName(), second, TextDecoration.ITALIC));
         }
 
-        plugin.sendMessage(sender, "command.alias.list.message", list.toString());
+        plugin.sendMessage(sender, "command.alias.list.message", list);
     }
 }

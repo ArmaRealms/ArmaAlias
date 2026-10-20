@@ -11,7 +11,7 @@ import com.darkblade12.simplealias.alias.action.CommandAction;
 import com.darkblade12.simplealias.alias.action.MessageAction;
 import com.darkblade12.simplealias.plugin.command.CommandBase;
 import com.darkblade12.simplealias.util.MessageUtils;
-import org.apache.commons.lang.StringUtils;
+import com.darkblade12.simplealias.util.ConvertUtils;
 import org.bukkit.command.CommandSender;
 
 import java.util.Collection;
@@ -27,7 +27,7 @@ public final class DetailsCommand extends CommandBase<SimpleAlias> {
 
     @Override
     public void execute(SimpleAlias plugin, CommandSender sender, String label, String[] args) {
-        String name = StringUtils.removeStart(args[0], "/");
+        String name = ConvertUtils.removeStart(args[0], "/");
         Alias alias = plugin.getAliasManager().getAlias(name);
         if (alias == null) {
             plugin.sendMessage(sender, "alias.notFound", name);
@@ -61,7 +61,6 @@ public final class DetailsCommand extends CommandBase<SimpleAlias> {
             builder.append(getLine(plugin, 3, ActionSetting.ENABLED_PERMISSION_GROUPS, action.getEnabledPermissionGroups()));
             builder.append(getLine(plugin, 3, ActionSetting.ENABLED_PARAMS, action.getEnabledParams()));
             builder.append(getLine(plugin, 3, ActionSetting.PRIORITY, action.getPriority()));
-            builder.append(getLine(plugin, 3, ActionSetting.TRANSLATE_COLOR_CODES, action.hasTranslateColorCodes()));
 
             if (action instanceof CommandAction) {
                 CommandAction commandAction = (CommandAction) action;
@@ -114,7 +113,7 @@ public final class DetailsCommand extends CommandBase<SimpleAlias> {
 
     private String getLine(SimpleAlias plugin, int indentationLevel, String key, Object value) {
         String spacer = IntStream.range(0, indentationLevel).mapToObj(i -> " ").collect(Collectors.joining());
-        return "\n§r" + spacer + plugin.formatMessage("command.alias.details.line", key, String.valueOf(value));
+        return "\n<reset>" + spacer + plugin.formatMessage("command.alias.details.line", key, String.valueOf(value));
     }
 
     private String getLine(SimpleAlias plugin, int indentationLevel, Enum<?> key, Object value) {
@@ -122,7 +121,7 @@ public final class DetailsCommand extends CommandBase<SimpleAlias> {
     }
 
     private String getLine(SimpleAlias plugin, int indentationLevel, Enum<?> key, Collection<?> value) {
-        return getLine(plugin, indentationLevel, key, value.isEmpty() ? "[]" : StringUtils.join(value, ", "));
+        return getLine(plugin, indentationLevel, key, value.isEmpty() ? "[]" : ConvertUtils.join(value, ", "));
     }
 
     private String getLine(SimpleAlias plugin, int indentationLevel, Enum<?> key, Map<?, ?> value) {

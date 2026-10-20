@@ -2,6 +2,7 @@ package com.darkblade12.simplealias.plugin.command;
 
 import com.darkblade12.simplealias.plugin.PluginBase;
 import org.bukkit.command.CommandSender;
+import com.darkblade12.simplealias.util.TextFormat;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,13 +28,13 @@ final class HelpIndex<T extends PluginBase> {
             if (index > visible.size() - 1) {
                 break;
             }
-            message.append("\n\u00A7r").append(getInfo(visible.get(index), label));
+            message.append("\n<reset>").append(getInfo(visible.get(index), label));
         }
 
         int pages = getPages(sender);
-        String currentPage = (page == pages ? "\u00A76\u00A7l" : "\u00A7a\u00A7l") + page;
-        message.append("\n\u00A7r").append(plugin.formatMessage("command.help.footer", currentPage, pages));
-        sender.sendMessage(message.toString());
+        String currentPage = (page == pages ? "<gold><bold>" : "<green><bold>") + page;
+        message.append("\n<reset>").append(plugin.formatMessage("command.help.footer", currentPage, pages));
+        sender.sendMessage(TextFormat.render(message.toString()));
     }
 
     public boolean hasPage(CommandSender sender, int page) {

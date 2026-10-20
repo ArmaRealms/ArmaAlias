@@ -1,7 +1,6 @@
 package com.darkblade12.simplealias.plugin;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.bukkit.ChatColor;
+import com.darkblade12.simplealias.util.JavaEscapes;
 
 import java.text.MessageFormat;
 import java.util.HashMap;
@@ -12,7 +11,7 @@ import java.util.ResourceBundle;
 
 public class MessageManager extends Manager<PluginBase> {
     private static final String BUNDLE_NAME = "messages";
-    private static final MessageFormat MISSING_FORMAT = new MessageFormat("§cThe message §6{0} §cis not available!");
+    private static final MessageFormat MISSING_FORMAT = new MessageFormat("<red>The message <gold>{0} <red>is not available!");
     private final Map<String, MessageFormat> messageCache;
     private ResourceBundle bundle;
 
@@ -43,8 +42,8 @@ public class MessageManager extends Manager<PluginBase> {
         MessageFormat format = messageCache.get(key);
         if (format == null) {
             try {
-                String message = StringEscapeUtils.unescapeJava(bundle.getString(key));
-                format = new MessageFormat(ChatColor.translateAlternateColorCodes('&', message));
+                String message = JavaEscapes.unescapeJava(bundle.getString(key));
+                format = new MessageFormat(message);
                 messageCache.put(key, format);
             } catch (MissingResourceException e) {
                 return MISSING_FORMAT.format(new Object[] { key });

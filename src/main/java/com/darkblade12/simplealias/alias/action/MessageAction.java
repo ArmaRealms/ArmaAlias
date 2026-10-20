@@ -3,6 +3,8 @@ package com.darkblade12.simplealias.alias.action;
 import com.darkblade12.simplealias.SimpleAlias;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import com.darkblade12.simplealias.plugin.hook.PlaceholderHook;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,23 +16,33 @@ public final class MessageAction extends Action {
     private boolean broadcast;
 
     public MessageAction(String name, Set<String> enabledWorlds, Set<String> enabledPermissionNodes, Set<String> enabledPermissionGroups,
-                         Map<Integer, String> enabledParams, int priority, boolean translateColorCodes, String message, boolean broadcast) {
-        super(name, enabledWorlds, enabledPermissionNodes, enabledPermissionGroups, enabledParams, priority, translateColorCodes);
+                         Map<Integer, String> enabledParams, int priority, String message, boolean broadcast) {
+        super(name, enabledWorlds, enabledPermissionNodes, enabledPermissionGroups, enabledParams, priority);
         this.message = message;
         this.broadcast = broadcast;
     }
 
     public MessageAction(String name, String message) {
-        this(name, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashMap<>(), 0, false, message, false);
+        this(name, new HashSet<>(), new HashSet<>(), new HashSet<>(), new HashMap<>(), 0, message, false);
     }
 
     @Override
     public void execute(SimpleAlias plugin, CommandSender sender, String[] params) {
-        String message = replaceVariables(this.message, plugin, sender, params);
+        PlaceholderHook placeholders = plugin.getPlaceholderHook();
         if (broadcast) {
-            Bukkit.broadcastMessage(message);
+            if (!placeholders.needsViewerContext(message)) {
+                Bukkit.broadcast(ActionMessageRenderer.render(message, plugin, sender, null, params));
+                return;
+            }
+
+            for (Player viewer : Bukkit.getOnlinePlayers()) {
+                viewer.sendMessage(ActionMessageRenderer.render(message, plugin, sender, viewer, params));
+            }
+            Bukkit.getConsoleSender().sendMessage(
+                    ActionMessageRenderer.render(message, plugin, sender, null, params));
         } else {
-            sender.sendMessage(message);
+            Player viewer = sender instanceof Player player ? player : null;
+            sender.sendMessage(ActionMessageRenderer.render(message, plugin, sender, viewer, params));
         }
     }
 

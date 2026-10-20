@@ -1,0 +1,25 @@
+name: Maven verification
+on:
+  push:
+    branches: [master]
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+      - name: Verify
+        run: mvn -B -ntp --no-transfer-progress clean verify
+      - name: Test Java string escaping without external libraries
+        run: java --class-path target/classes src/test/java/com/darkblade12/simplealias/util/JavaEscapesTest.java
+      - name: Test viewer placeholder tokens
+        run: java --class-path target/classes src/test/java/com/darkblade12/simplealias/util/ViewerPlaceholdersTest.java
+      - name: Test MiniMessage and placeholder sanitization
+        run: |
+          mvn -B -ntp dependency:build-classpath -Dmdep.outputFile=target/test-classpath
+          java --class-path "target/classes:$(cat target/test-classpath)" src/test/java/com/darkblade12/simplealias/util/TextFormatTest.java

@@ -19,7 +19,7 @@ final class PlayerProxy implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         String methodName = method.getName();
-        if (grantPermission && methodName.equals("hasPermission") || methodName.equals("isOp")) {
+        if (grantPermission && (methodName.equals("hasPermission") || methodName.equals("isOp"))) {
             return true;
         } else if (silent && (methodName.equals("sendMessage") || methodName.equals("sendRawMessage"))) {
             return null;
