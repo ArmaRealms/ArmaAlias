@@ -12,12 +12,14 @@ import java.util.regex.Pattern;
 public final class TextFormat {
     private static final MiniMessage MINI = MiniMessage.miniMessage();
     private static final Pattern LEGACY_CODES = Pattern.compile(
-            "(?i)(?:[&§]x(?:[&§][0-9a-f]){6}|[&§]#[0-9a-f]{6}|[&§][0-9a-fk-orx])");
+            "(?i)(?:§x(?:[&§][0-9a-f]){6}|(?<![\p{L}\p{N}])&x(?:[&§][0-9a-f]){6}"
+            + "|§#[0-9a-f]{6}|(?<![\p{L}\p{N}])&#[0-9a-f]{6}"
+            + "|§[0-9a-fk-orx]|(?<![\p{L}\p{N}])&[0-9a-fk-orx])");
 
     private TextFormat() {
     }
 
-    /** Remove old formatting rather than passing it to the MiniMessage renderer. */
+    /** Discard recognized legacy formatting from external values while preserving ordinary text. */
     public static String stripLegacyCodes(String input) {
         return input == null ? "" : LEGACY_CODES.matcher(input).replaceAll("").replace("§", "");
     }
@@ -29,7 +31,7 @@ public final class TextFormat {
     public static Component render(String template, Map<String, Component> variables) {
         TagResolver.Builder resolvers = TagResolver.builder();
         variables.forEach((name, value) -> resolvers.resolver(Placeholder.component(name, value)));
-        return MINI.deserialize(stripLegacyCodes(template), resolvers.build());
+        return MINI.deserialize(template, resolvers.build());
     }
 
     /** PlaceholderAPI and arguments can never inject MiniMessage events or styling. */

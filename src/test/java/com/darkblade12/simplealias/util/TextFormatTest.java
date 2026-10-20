@@ -17,13 +17,18 @@ public final class TextFormatTest {
         check("Hello", TextFormat.stripLegacyCodes("§x§a§a§b§b§c§cHello"), "RGB code stripped");
         check("Hello", TextFormat.stripLegacyCodes("&x&a&a&b&b&c&cHello"), "RGB ampersand stripped");
         check("A plain & separator", TextFormat.stripLegacyCodes("A plain & separator"), "ordinary ampersand");
+        check("R&D", TextFormat.stripLegacyCodes("R&D"), "literal ampersand inside words");
+        check("R&D", PlainTextComponentSerializer.plainText().serialize(
+                TextFormat.render("R&D")), "MiniMessage template leaves literal ampersand alone");
+        check("R&D", PlainTextComponentSerializer.plainText().serialize(
+                TextFormat.external("R&D")), "external values keep ordinary text");
         check("", TextFormat.stripLegacyCodes(null), "null value");
         assertNoLegacyConfig("src/main/resources/messages.properties");
         assertNoLegacyConfig("src/main/resources/messages_en.properties");
         assertNoLegacyConfig("src/main/resources/template.yml");
         assertNoLegacyConfig("src/main/resources/template_uncommented.yml");
-        check("AB", PlainTextComponentSerializer.plainText().serialize(
-                TextFormat.render("<red>A&aB")), "old code in configured template is discarded");
+        check("A&aB", PlainTextComponentSerializer.plainText().serialize(
+                TextFormat.render("<red>A&aB")), "legacy code is literal in MiniMessage template");
 
         Component normal = TextFormat.render("<green>Hi <bold>world</bold>");
         check("Hi world", PlainTextComponentSerializer.plainText().serialize(normal), "MiniMessage rendering");

@@ -81,8 +81,9 @@ such as `<red>`, `<bold>`, `<#aabbcc>`, `<gradient:green:aqua>`,
 `<hover:show_text:"...">` and `<click:run_command:"...">`.
 
 Legacy codes (`&a`, `§a`, `&#aabbcc`, `§x§a§a...`) are **not supported**.
-Old formatting sequences are discarded from configured messages and
-PlaceholderAPI values, not converted to MiniMessage. Dynamic values are inserted
+Configured messages are parsed as MiniMessage only: old color sequences
+remain literal and must be migrated. Recognized color sequences in PlaceholderAPI
+values are discarded, not converted to MiniMessage. Dynamic values are inserted
 as plain-text components; external MiniMessage tags cannot create click/hover
 events. Migrate existing alias configs and custom message bundles to MiniMessage.
 
