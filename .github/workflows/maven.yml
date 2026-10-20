@@ -19,3 +19,7 @@ jobs:
         run: java --class-path target/classes src/test/java/com/darkblade12/simplealias/util/JavaEscapesTest.java
       - name: Test viewer placeholder tokens
         run: java --class-path target/classes src/test/java/com/darkblade12/simplealias/util/ViewerPlaceholdersTest.java
+      - name: Test Adventure and legacy color conversion
+        run: |
+          mvn -B -ntp dependency:build-classpath -Dmdep.outputFile=target/test-classpath
+          java --class-path "target/classes:$(cat target/test-classpath)" src/test/java/com/darkblade12/simplealias/util/TextFormatTest.java
