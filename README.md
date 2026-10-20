@@ -19,7 +19,7 @@ Install `target/SimpleAlias-2.0.0.jar` on Paper 1.21.11. This is a **Paper plugi
 - `General_Settings.Command_Sync: true` (default) schedules a **Minecraft data reload** on the next tick after creating, deleting, renaming or reloading an alias. This is heavier than the old command map sync; consider disabling it on busy production servers.
 - With `Command_Sync: false`, existing commands pick up configuration changes immediately, but new/deleted/renamed command **labels** are reflected in Brigadier only at `/minecraft:reload` or server restart.
 
-Only Paper API and Vault API are declared as Maven dependencies. Vault is an optional server integration for economy and permission groups. Factions and MassiveCore integration, `<faction_name>` replacement, bStats, and the old Commons Lang dependency were removed. Existing aliases that use `<faction_name>` must be updated.
+Paper API, Vault API and PlaceholderAPI are declared as Maven dependencies with `provided` scope. Vault and PlaceholderAPI remain optional at server runtime: Vault supplies economy/group services, while PlaceholderAPI resolves configured external placeholders. Factions and MassiveCore integration, `<faction_name>` replacement, bStats, and the old Commons Lang dependency were removed. Existing aliases that use `<faction_name>` must be updated.
 
 ## Manual regression checklist
 
