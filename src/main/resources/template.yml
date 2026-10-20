@@ -74,8 +74,17 @@ General_Settings:
       # Relational/viewer tokens are resolved per recipient only for MESSAGE actions.
       # Example: '&a%player_name% &7-> &f{viewer:player_name} &7(%rel_example_relation%)'
       # This is an action specific setting called 'Message'
+      # The example below uses MiniMessage tags:
+      # <gradient:#55ff55:#55ffff> -> gradient with hex colors
+      # <bold>...</bold> -> bold text; <gray>...</gray> -> named color
+      # <hover:show_text:"..."> -> tooltip when hovering over [Help]
+      # <click:run_command:"/alias help"> -> run /alias help when clicked
+      # <sender_name> is an internal variable, resolved safely for the executor
+      # Alternative examples (replace Message with one of these):
+      # Message: '<rainbow>Rainbow text</rainbow><newline><italic>Second line</italic>'
+      # Message: '<#ffaa00><underlined>Hex-colored, underlined text</underlined></#ffaa00>'
       # This text will be sent to the sender or broadcast when this action is executed
-      Message: '&cThis alias has not been setup yet!'
+      Message: '<gradient:#55ff55:#55ffff><bold>Hello, <sender_name>!</bold></gradient> <gray><hover:show_text:"Click to open help"><click:run_command:"/alias help">[Help]</click></hover></gray>'
 
       # This is an action specific setting called 'Broadcast'
       # Determines whether the text will be broadcast or just sent to the player

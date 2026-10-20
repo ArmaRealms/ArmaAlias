@@ -22,7 +22,7 @@ General_Settings:
       # Enabled_Params: example@0
       Priority: 0
       Translate_Color_Codes: false
-      Message: '&cThis alias has not been setup yet!'
+      Message: '<gradient:#55ff55:#55ffff><bold>Hello, <sender_name>!</bold></gradient> <gray><hover:show_text:"Click to open help"><click:run_command:"/alias help">[Help]</click></hover></gray>'
       # PAPI: %player_name% for executor; %rel_example_relation% and
       # {viewer:player_name} per viewer when Broadcast is enabled.
       Broadcast: false
