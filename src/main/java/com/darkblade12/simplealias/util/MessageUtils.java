@@ -4,6 +4,9 @@ import com.darkblade12.simplealias.util.JavaEscapes;
 import com.darkblade12.simplealias.util.ConvertUtils;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
+import net.kyori.adventure.text.format.NamedTextColor;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -12,7 +15,39 @@ public final class MessageUtils {
     private static final Pattern COLOR_CODE_PATTERN = Pattern.compile("§([0-9a-fk-orx])", Pattern.CASE_INSENSITIVE);
     private static final Pattern ARGUMENT_COLOR_PATTERN = Pattern.compile("(?i)&([0-9a-fk-or])");
 
+    private static final NamedTextColor[] RANDOM_COLORS = {
+            NamedTextColor.DARK_BLUE, NamedTextColor.DARK_GREEN, NamedTextColor.DARK_AQUA,
+            NamedTextColor.DARK_RED, NamedTextColor.DARK_PURPLE, NamedTextColor.GOLD,
+            NamedTextColor.GRAY, NamedTextColor.BLUE, NamedTextColor.GREEN,
+            NamedTextColor.AQUA, NamedTextColor.RED, NamedTextColor.LIGHT_PURPLE, NamedTextColor.YELLOW
+    };
+    private static final Map<NamedTextColor, NamedTextColor> SIMILAR_COLORS = Map.of(
+            NamedTextColor.DARK_BLUE, NamedTextColor.BLUE,
+            NamedTextColor.DARK_GREEN, NamedTextColor.GREEN,
+            NamedTextColor.DARK_AQUA, NamedTextColor.AQUA,
+            NamedTextColor.DARK_RED, NamedTextColor.RED,
+            NamedTextColor.DARK_PURPLE, NamedTextColor.LIGHT_PURPLE,
+            NamedTextColor.DARK_GRAY, NamedTextColor.GRAY,
+            NamedTextColor.GOLD, NamedTextColor.YELLOW
+    );
+
+
     private MessageUtils() {
+    }
+
+    public static NamedTextColor randomColor() {
+        return RANDOM_COLORS[ThreadLocalRandom.current().nextInt(RANDOM_COLORS.length)];
+    }
+
+    public static NamedTextColor similarColor(NamedTextColor color) {
+        NamedTextColor direct = SIMILAR_COLORS.get(color);
+        if (direct != null) {
+            return direct;
+        }
+        return SIMILAR_COLORS.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(color))
+                .map(Map.Entry::getKey)
+                .findFirst().orElse(color);
     }
 
     public static String formatName(Enum<?> enumObj, boolean capitalize, String delimiter) {
