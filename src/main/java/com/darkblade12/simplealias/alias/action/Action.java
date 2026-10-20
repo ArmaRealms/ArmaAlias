@@ -3,7 +3,6 @@ package com.darkblade12.simplealias.alias.action;
 import com.darkblade12.simplealias.SimpleAlias;
 import com.darkblade12.simplealias.alias.DynamicVariable;
 import com.darkblade12.simplealias.nameable.Nameable;
-import com.darkblade12.simplealias.plugin.hook.FactionsHook;
 import com.darkblade12.simplealias.plugin.hook.VaultHook;
 import com.darkblade12.simplealias.replacer.Replacer;
 import com.darkblade12.simplealias.util.MessageUtils;
@@ -61,10 +60,6 @@ public abstract class Action implements Nameable, Comparable<Action> {
                 }
             }
 
-            FactionsHook factions = plugin.getFactionsHook();
-            if (factions.isEnabled()) {
-                builder.with(DynamicVariable.FACTION_NAME, factions.getFaction(player));
-            }
         }
 
         if (params.length > 0) {

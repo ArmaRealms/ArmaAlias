@@ -9,7 +9,6 @@ import com.darkblade12.simplealias.command.AliasCommandHandler;
 import com.darkblade12.simplealias.cooldown.CooldownManager;
 import com.darkblade12.simplealias.plugin.PluginBase;
 import com.darkblade12.simplealias.plugin.command.CommandRegistrationException;
-import com.darkblade12.simplealias.plugin.hook.FactionsHook;
 import com.darkblade12.simplealias.plugin.hook.VaultHook;
 import com.darkblade12.simplealias.plugin.reader.ConfigurationReader;
 import com.darkblade12.simplealias.plugin.settings.InvalidValueException;
@@ -29,7 +28,6 @@ public final class SimpleAlias extends PluginBase {
     public static final String PREFIX = "§8§l[§a§oSimple§7§oAlias§8§l]§r";
     private final Settings settings;
     private final VaultHook vaultHook;
-    private final FactionsHook factionsHook;
     private final CooldownManager cooldownManager;
     private final AliasManager aliasManager;
     private final AliasCommandHandler commandHandler;
@@ -39,10 +37,8 @@ public final class SimpleAlias extends PluginBase {
     private boolean commandRefreshScheduled;
 
     public SimpleAlias() {
-        super(47360, 8539);
         settings = new Settings(this);
         vaultHook = new VaultHook();
-        factionsHook = new FactionsHook();
         cooldownManager = new CooldownManager(this);
         aliasManager = new AliasManager(this);
         commandHandler = new AliasCommandHandler(this);
@@ -68,10 +64,6 @@ public final class SimpleAlias extends PluginBase {
             logInfo("Vault detected and hooked. ({0})",
                     services.entrySet().stream().filter(Map.Entry::getValue).map(Map.Entry::getKey).collect(Collectors.joining(" and ")));
         }
-        if (factionsHook.enable()) {
-            logInfo("Factions detected and hooked.");
-        }
-
         try {
             cooldownManager.enable();
             aliasManager.enable();
@@ -141,7 +133,6 @@ public final class SimpleAlias extends PluginBase {
         initializeTemplate();
 
         vaultHook.enable();
-        factionsHook.enable();
 
         convertAliases();
 
@@ -213,10 +204,6 @@ public final class SimpleAlias extends PluginBase {
 
     public VaultHook getVaultHook() {
         return vaultHook;
-    }
-
-    public FactionsHook getFactionsHook() {
-        return factionsHook;
     }
 
     public CooldownManager getCooldownManager() {

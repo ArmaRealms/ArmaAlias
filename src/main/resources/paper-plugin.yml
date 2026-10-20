@@ -11,23 +11,3 @@ dependencies:
       load: BEFORE
       required: false
       join-classpath: true
-    Factions:
-      load: BEFORE
-      required: false
-      join-classpath: true
-    MassiveCore:
-      load: BEFORE
-      required: false
-      join-classpath: true
-    Multiverse-Core:
-      load: BEFORE
-      required: false
-    Multiworld:
-      load: BEFORE
-      required: false
-    PlotMe:
-      load: BEFORE
-      required: false
-    MyWorlds:
-      load: BEFORE
-      required: false

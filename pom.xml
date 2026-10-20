@@ -10,7 +10,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.release>21</maven.compiler.release>
+        <maven.compiler.release>25</maven.compiler.release>
     </properties>
 
     <repositories>
@@ -43,30 +43,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>com.massivecraft.factions</groupId>
-            <artifactId>Factions</artifactId>
-            <version>2.14.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/Factions.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>com.massivecraft.massivecore</groupId>
-            <artifactId>MassiveCore</artifactId>
-            <version>2.14.0</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/libs/MassiveCore.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bstats</groupId>
-            <artifactId>bstats-bukkit</artifactId>
-            <version>3.2.1</version>
-        </dependency>
     </dependencies>
 
     <build>
@@ -92,41 +68,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
-                    <release>21</release>
+                    <release>25</release>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.6.0</version>
-                <configuration>
-                    <createDependencyReducedPom>false</createDependencyReducedPom>
-                    <artifactSet>
-                        <includes>
-                            <include>org.bstats:bstats-bukkit</include>
-                            <include>org.bstats:bstats-base</include>
-                            <include>commons-lang:commons-lang</include>
-                        </includes>
-                    </artifactSet>
-                    <relocations>
-                        <relocation>
-                            <pattern>org.bstats</pattern>
-                            <shadedPattern>com.darkblade12.simplealias.metrics</shadedPattern>
-                        </relocation>
-                        <relocation>
-                            <pattern>org.apache.commons.lang</pattern>
-                            <shadedPattern>com.darkblade12.simplealias.libs.commons.lang</shadedPattern>
-                        </relocation>
-                    </relocations>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
