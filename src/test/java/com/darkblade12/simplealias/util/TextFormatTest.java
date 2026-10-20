@@ -18,6 +18,10 @@ public final class TextFormatTest {
         check("Hello", TextFormat.stripLegacyCodes("&x&a&a&b&b&c&cHello"), "RGB ampersand stripped");
         check("A plain & separator", TextFormat.stripLegacyCodes("A plain & separator"), "ordinary ampersand");
         check("", TextFormat.stripLegacyCodes(null), "null value");
+        assertNoLegacyConfig("src/main/resources/messages.properties");
+        assertNoLegacyConfig("src/main/resources/messages_en.properties");
+        assertNoLegacyConfig("src/main/resources/template.yml");
+        assertNoLegacyConfig("src/main/resources/template_uncommented.yml");
         check("AB", PlainTextComponentSerializer.plainText().serialize(
                 TextFormat.render("<red>A&aB")), "old code in configured template is discarded");
 
@@ -48,6 +52,18 @@ public final class TextFormatTest {
                 PlainTextComponentSerializer.plainText().serialize(template), "template example rendering");
         if (!hasClickEvent(template) || !hasHoverEvent(template)) {
             throw new AssertionError("template MiniMessage example must expose click and hover events");
+        }
+    }
+
+    private static void assertNoLegacyConfig(String path) {
+        try {
+            String content = Files.readString(Path.of(path));
+            if (content.matches("(?s).*[&§][0-9a-fk-orx].*")
+                    || content.contains("Translate_Color_Codes")) {
+                throw new AssertionError("legacy formatting is still present in " + path);
+            }
+        } catch (IOException e) {
+            throw new AssertionError("unable to read resource: " + path, e);
         }
     }
 

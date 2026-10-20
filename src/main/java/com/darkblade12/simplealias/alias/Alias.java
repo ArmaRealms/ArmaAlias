@@ -393,6 +393,8 @@ public final class Alias implements Nameable {
                                                .collect(Collectors.toList());
             section.set(ActionSetting.ENABLED_PARAMS.getPath(), enabledParams);
             section.set(ActionSetting.PRIORITY.getPath(), action.getPriority());
+            // Remove the obsolete legacy-color field when resaving an existing alias.
+            section.set("Translate_Color_Codes", null);
 
             if (action instanceof CommandAction) {
                 CommandAction commandAction = (CommandAction) action;
